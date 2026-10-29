@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MILOPS // ECHO FRONT — Hex Tactics</title>
+<style>
+:root{--bg:#080e14;--panel:#0c1820;--panel2:#101e26;--edge:#29414b;--edge2:#3c626e;--cyan:#83dfd7;--faint:#6c9398;--blue:#5db7f3;--enemy:#f17b68;--gold:#dfbc74;--txt:#d4e9e6;--green:#a4d8a2;--mono:'Courier New',Consolas,monospace;--ui:system-ui,'Segoe UI',sans-serif}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--txt);font-family:var(--ui)}body{overflow:hidden;background:radial-gradient(ellipse at 45% -20%,#253944 0%,#0b151c 55%,#070b10 100%)}button{font:inherit;cursor:pointer}button:disabled{cursor:not-allowed;opacity:.37;filter:saturate(.6)}button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}canvas{display:block}::selection{background:#386b70}
+#app{height:100dvh;min-height:570px;display:flex;flex-direction:column;padding:13px 16px 13px;gap:10px;max-width:1920px;margin:auto}
+.topbar{min-height:62px;display:flex;align-items:center;gap:20px;border:1px solid var(--edge);background:linear-gradient(90deg,#10212a,#0a151c);padding:0 17px;box-shadow:0 3px 24px #0006;position:relative}
+.topbar:before,.topbar:after{content:'';position:absolute;height:2px;width:74px;background:var(--cyan);top:-2px;left:16px}.topbar:after{width:44px;left:auto;right:16px;background:var(--gold)}
+.brand{display:flex;gap:12px;align-items:center;white-space:nowrap}.brand-emblem{width:35px;height:35px;display:grid;place-items:center;border:2px solid var(--cyan);clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0 50%);font-family:var(--mono);font-size:20px;font-weight:bold;color:var(--cyan);background:#143039}.brand-main{font-family:var(--mono);font-weight:bold;font-size:22px;letter-spacing:4px;line-height:1}.brand-sub{font:9px var(--mono);letter-spacing:2px;color:var(--faint);margin-top:5px}
+.top-line{height:28px;width:1px;background:#334d55}.mission-title{font:700 11px var(--mono);letter-spacing:1.8px;color:#bcdbd8}.mission-title small{font-weight:normal;display:block;margin-top:4px;color:var(--faint);letter-spacing:1px}.top-status{margin-left:auto;display:flex;align-items:center;gap:19px}.status-pair{display:flex;flex-direction:column;gap:3px;font:10px var(--mono);color:var(--faint);letter-spacing:1px}.status-pair b{font-size:16px;letter-spacing:1px;color:#dcebe6}.status-pair b.blue{color:var(--blue)}.status-pair b.gold{color:var(--gold)}.signal{display:flex;align-items:center;gap:6px;color:#a6cbb6;font:10px var(--mono);white-space:nowrap}.signal i{width:7px;height:7px;background:#91d0a0;border-radius:50%;box-shadow:0 0 13px #91d0a0;animation:pulse 2s infinite}
+.content{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 323px;gap:10px}
+.board-wrap{position:relative;min-width:0;min-height:0;background:#101e25;border:1px solid #36545d;overflow:hidden;box-shadow:inset 0 0 70px #0006;touch-action:none}
+.board-wrap:after{content:'';pointer-events:none;position:absolute;inset:0;box-shadow:inset 0 0 65px 20px #030b11a8}
+#mapCanvas{width:100%;height:100%;cursor:crosshair;touch-action:none}
+.map-head{position:absolute;top:13px;left:14px;z-index:2;display:flex;gap:7px;pointer-events:none;flex-wrap:wrap}.map-chip{font:10px var(--mono);color:#c0dbd8;background:#0c1b21dc;border:1px solid #40606a;padding:7px 10px;backdrop-filter:blur(4px);letter-spacing:1px}.map-chip strong{color:var(--cyan)}
+.map-bottom{position:absolute;bottom:12px;left:13px;z-index:2;display:flex;gap:7px;align-items:center;pointer-events:none;flex-wrap:wrap}.map-bottom .map-chip{font-size:9px}.map-coords{font-family:var(--mono);color:var(--cyan)}
+.map-tools{position:absolute;bottom:14px;right:14px;z-index:3;display:flex;gap:5px;flex-direction:column}.map-tools button{width:33px;height:33px;border:1px solid #42616b;background:#0b1b24df;color:var(--cyan);font:19px var(--mono);padding:0}.map-tools button:hover{background:#24434b}
+.marker-legend{position:absolute;right:15px;top:14px;z-index:2;text-align:right;color:#94bdba;font:10px var(--mono);background:#07131aba;border:1px solid #27444b;padding:10px 12px;line-height:1.85;pointer-events:none}.marker-legend i{display:inline-block;width:8px;height:8px;margin-right:5px}.allydot{background:var(--blue)}.enemydot{background:var(--enemy)}.objdot{background:var(--gold)}
+.sidebar{display:flex;flex-direction:column;gap:9px;overflow:auto;scrollbar-width:thin;scrollbar-color:#41626a #0b1720;min-width:0}.panel{border:1px solid var(--edge);background:linear-gradient(150deg,#10212a,#0b171f);min-width:0}.panel-head{height:35px;border-bottom:1px solid #2a424b;padding:0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;font:700 11px var(--mono);letter-spacing:1.5px;color:#b0d0cd;background:#11242d}.panel-head .hbadge{font-size:9px;letter-spacing:.5px;color:var(--cyan);font-weight:normal}.panel-body{padding:12px}.objectives{display:flex;flex-direction:column;gap:10px}.objective{display:flex;gap:11px;align-items:flex-start}.objective .mark{font:18px var(--mono);color:var(--gold);line-height:1}.objective.done .mark{color:var(--green)}.objective .ob-title{font:700 11px var(--mono);line-height:1.4;color:#dce9df}.objective.done .ob-title{text-decoration:line-through;color:#8fa5a7}.objective .ob-info{font-size:11px;color:#92aeb1;margin-top:3px;line-height:1.45}.objective.bonus{border-top:1px dashed #344950;padding-top:10px}.objective.bonus .mark{color:#9ac8e3}
+#unitPanel{min-height:165px}.empty-unit{font:11px/1.7 var(--mono);color:#708f94;text-align:center;padding:18px 12px}.unit-head{display:flex;gap:11px;align-items:center;margin-bottom:13px}.unit-portrait{height:65px;width:80px;flex-shrink:0;display:grid;place-items:center;border:1px solid #46636f;background:radial-gradient(ellipse at 50% 40%,#2c5564,#0e212b);position:relative;overflow:hidden}.unit-portrait canvas{width:100%;height:100%}.unit-name{font:700 14px var(--mono);letter-spacing:1px;color:#d8e8e6}.unit-meta{font:10px var(--mono);color:#789ca6;line-height:2}.stat-label{display:flex;justify-content:space-between;gap:5px;margin-bottom:5px;font:10px var(--mono);color:#92adb1}.health-track{height:7px;background:#293b42;border:1px solid #344b54;margin-bottom:10px}.health-fill{height:100%;background:linear-gradient(90deg,#489f83,#a6d7ac);transition:width .25s}.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:10px}.stats-grid div{padding:7px 4px;background:#091923;border:1px solid #2b4750;text-align:center;font:9px var(--mono);color:#7fa3ad}.stats-grid b{display:block;font:700 13px var(--mono);color:#d4eae7;margin-top:4px}.unit-actions{display:flex;gap:6px}.unit-actions button{flex:1}
+.btn{font:700 10px var(--mono);letter-spacing:1px;padding:10px 8px;background:#172b33;color:#b9d6d7;border:1px solid #365964;transition:.15s}.btn:hover:enabled{border-color:var(--cyan);color:#e0fff4;background:#24434a}.btn.primary{background:#22615e;border-color:#4daca7;color:#e2fff9}.btn.danger{background:#482c2c;border-color:#9c625e;color:#ffc3b8}.btn.amber{border-color:#906e44;color:#eac48b;background:#372e22}.btn.full{width:100%}
+.production-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.buy-btn{border:1px solid #334d56;background:#10242e;display:flex;justify-content:space-between;gap:4px;align-items:center;padding:9px 8px;color:#c4e0db;text-align:left;min-width:0}.buy-btn:hover:enabled{border-color:var(--cyan);background:#1b3640}.buy-btn .label{font:10px var(--mono);font-weight:bold}.buy-btn .cost{font:700 10px var(--mono);color:var(--gold);white-space:nowrap}.buy-btn small{display:block;font:9px var(--mono);color:#7397a2;margin-top:4px}.buy-btn:disabled{opacity:.34}
+.events{display:flex;flex-direction:column;gap:8px}.event{display:flex;gap:9px;color:#8aabac;font:10px/1.45 var(--mono)}.event .tick{color:#6f929b;white-space:nowrap}.event.alert{color:#e3b17f}.event.good{color:#a2d4be}.event.enemy{color:#e89b91}
+.sidebar-foot{display:flex;gap:6px}.sidebar-foot button{flex:1;min-width:0}
+.footer{height:42px;display:flex;gap:8px;align-items:center;border:1px solid var(--edge);background:#0e1a22;padding:0 10px}.ticker-label{font:700 9px var(--mono);color:var(--cyan);letter-spacing:1.5px;white-space:nowrap;border-right:1px solid var(--edge);padding-right:12px}.ticker{font:11px var(--mono);color:#a2c4bf;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}.footer .key{font:10px var(--mono);color:#718f91;white-space:nowrap}.footer button{border:1px solid #2f515a;background:#162b34;color:#b6d4d2;padding:6px 9px;font:10px var(--mono);white-space:nowrap}.footer button:hover{border-color:var(--cyan)}
+/* cinematic notebook */
+#notebookScreen{position:fixed;inset:0;z-index:20;background:radial-gradient(ellipse at 50% 50%,#192e37 0%,#081015 75%);display:flex;align-items:center;justify-content:center;overflow:auto;padding:20px;transition:opacity .55s,visibility .55s}#notebookScreen.hidden{opacity:0;visibility:hidden;pointer-events:none}
+#notebookScreen:before{content:'';pointer-events:none;position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0px,transparent 3px,#80c5c508 4px);z-index:5}
+.notebook-wrap{width:min(100%,970px);perspective:1200px;position:relative}.notebook-topline{font:10px var(--mono);color:#789ea3;letter-spacing:2px;margin:0 0 10px 6px;display:flex;justify-content:space-between}.notebook{position:relative;border:10px solid #26353c;border-top-color:#3f565b;border-bottom-color:#19262c;border-radius:13px 13px 9px 9px;background:#080e13;box-shadow:0 33px 100px #000c,0 0 0 3px #090f14,0 0 80px #18495222;overflow:hidden;transform-origin:bottom center;animation:unfold 1.3s cubic-bezier(.16,.8,.24,1) both}.notebook:before{content:'';height:16px;position:absolute;top:0;left:10px;right:10px;border-bottom:1px solid #39494f;z-index:3;background:linear-gradient(90deg,#253840,#121d24,#263942)}@keyframes unfold{0%{transform:rotateX(-88deg) scale(.84);filter:brightness(.15);opacity:.25}45%{filter:brightness(.4)}100%{transform:rotateX(0) scale(1);filter:brightness(1);opacity:1}}
+.notebook-top{display:flex;justify-content:space-between;align-items:center;padding:24px 22px 12px;border-bottom:1px solid #284a51;background:linear-gradient(90deg,#0d2228,#07161e)}.notebook-logo{font:700 25px var(--mono);letter-spacing:6px;color:#9de1d8;text-shadow:0 0 18px #5de1d866}.notebook-logo span{font-size:10px;color:#75a6a7;letter-spacing:2px;display:block;margin-top:3px}.notebook-id{font:10px/1.7 var(--mono);color:#95b4b4;text-align:right;letter-spacing:1px}.notebook-id strong{color:var(--gold)}
+.notebook-screen{min-height:340px;display:grid;grid-template-columns:minmax(0,1.13fr) minmax(0,.87fr);background:#0a1d23}.brief-visual{position:relative;overflow:hidden;min-height:315px;border-right:1px solid #29444e;background:#07161c}.brief-visual canvas{width:100%;height:100%;position:absolute;inset:0}.visual-overlay{position:absolute;left:12px;top:12px;font:9px var(--mono);color:#9bc8c6;letter-spacing:1px;text-shadow:0 1px 2px #000}.visual-footer{position:absolute;bottom:12px;left:12px;font:9px var(--mono);color:#8eaead}.brief-info{padding:22px 22px 16px;display:flex;flex-direction:column;min-width:0}.brief-overline{font:700 10px var(--mono);letter-spacing:2px;color:var(--gold);margin-bottom:11px}.brief-title{font:700 clamp(19px,2.4vw,29px) var(--mono);line-height:1.13;letter-spacing:1px;color:#e7f1e7;text-transform:uppercase;margin-bottom:18px}.brief-body{font:12px/1.85 var(--mono);color:#abcac4;white-space:pre-line;min-height:155px;flex:1}.cursor{display:inline-block;width:6px;height:12px;background:#83cbc3;vertical-align:middle;margin-left:3px;animation:pulse .8s steps(1) infinite}.brief-urgent{font:10px var(--mono);color:#e9ad76;border-left:3px solid #b98553;background:#3f31242a;padding:8px 10px;margin-top:12px}.notebook-foot{display:flex;align-items:center;gap:12px;padding:15px 20px;border-top:1px solid #29444d;background:#0c1d24;flex-wrap:wrap}.boot-progress{height:4px;flex:1;min-width:60px;background:#223940}.boot-progress span{display:block;height:100%;background:var(--cyan);box-shadow:0 0 9px #80d9d6;transition:width .3s}.notebook-foot .phase{font:9px var(--mono);letter-spacing:1px;color:#7ca4a5}.notebook-foot button{min-width:143px}.notebook-hinge{height:17px;width:85%;margin:auto;background:linear-gradient(#35484f,#151e24 50%,#304248);border:1px solid #1c292d;border-radius:0 0 9px 9px}.notebook-base{height:12px;width:101%;margin-left:-.5%;background:linear-gradient(#4a5c61,#17232a);border:1px solid #54616a;border-radius:0 0 70% 70%;box-shadow:0 7px 15px #0008}
+#battleOverlay{position:fixed;inset:0;z-index:16;display:none;align-items:center;justify-content:center;background:#010910d5;backdrop-filter:blur(3px);padding:14px}#battleOverlay.show{display:flex}.battle-box{width:min(100%,790px);border:5px solid #233942;background:#0b1920;box-shadow:0 25px 80px #000b}.battle-head{display:flex;justify-content:space-between;gap:5px;padding:12px 18px;background:#142a31;border-bottom:1px solid #40626a;font:700 10px var(--mono);letter-spacing:2px;color:var(--gold)}#battleCanvas{width:100%;height:300px;background:#102b32}.battle-footer{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;gap:10px;font:11px var(--mono);color:#b0d5d5}.battle-footer strong{font-size:18px;color:#fff}.battle-damage{display:flex;gap:30px}.battle-damage span{color:var(--enemy)}
+#toast{position:fixed;z-index:17;left:50%;top:94px;transform:translateX(-50%) translateY(-12px);pointer-events:none;background:#0c252adf;border:1px solid #558c8b;padding:11px 18px;font:11px var(--mono);letter-spacing:.7px;color:#d3ede6;opacity:0;transition:opacity .25s,transform .25s;box-shadow:0 8px 35px #0008;text-align:center;max-width:90vw}#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#helpOverlay{position:fixed;inset:0;z-index:30;background:#02090cd9;display:none;align-items:center;justify-content:center;padding:16px}#helpOverlay.show{display:flex}.help-box{max-width:620px;width:100%;max-height:88vh;overflow:auto;border:1px solid #4e8186;background:#0e2029;padding:25px;box-shadow:0 20px 80px #000c}.help-box h2{font:700 21px var(--mono);color:var(--cyan);letter-spacing:3px;margin:0 0 15px}.help-box h3{font:700 12px var(--mono);color:var(--gold);margin-top:20px}.help-box p,.help-box li{font:12px/1.8 var(--mono);color:#b6d1ce}.help-box ul{padding-left:22px}.help-box .btn{margin-top:15px}
+@keyframes pulse{50%{opacity:.35}}@media(max-width:950px){#app{padding:8px;gap:6px}.content{grid-template-columns:minmax(0,1fr) 260px;gap:6px}.sidebar{gap:6px}.top-status{gap:9px}.status-pair b{font-size:13px}.mission-title{display:none}.top-line{display:none}.marker-legend{display:none}.panel-body{padding:9px}.production-list{grid-template-columns:1fr 1fr}.buy-btn{padding:7px 6px}.brand-main{font-size:19px}.topbar{min-height:56px;padding:0 9px}.footer .key{display:none}}@media(max-width:650px){body{overflow:auto}#app{height:auto;min-height:100dvh}.topbar{height:52px}.brand-sub{display:none}.brand-main{font-size:16px;letter-spacing:1px}.brand-emblem{height:29px;width:29px}.top-status{gap:12px}.top-status .status-pair:nth-of-type(3),.top-status .signal{display:none}.content{display:flex;flex-direction:column}.board-wrap{height:53vh;min-height:330px}.sidebar{overflow:visible;display:grid;grid-template-columns:1fr 1fr;align-items:start}.panel{min-width:0}.sidebar .panel:nth-child(2){grid-row:span 2}.production-list{grid-template-columns:1fr 1fr}.sidebar-foot{grid-column:span 2}.footer{min-height:41px}.footer .ticker-label{display:none}.notebook-screen{grid-template-columns:1fr}.brief-visual{min-height:170px;height:180px;border-right:0;border-bottom:1px solid #29444e}.brief-info{padding:16px;min-height:220px}.brief-body{min-height:70px}.brief-title{font-size:20px;margin-bottom:10px}.notebook-top{padding:20px 14px 10px}.notebook-logo{font-size:19px;letter-spacing:2px}.notebook-id{font-size:8px}.notebook-foot{padding:10px;gap:7px}.notebook-foot button{min-width:110px}.notebook{border-width:6px}.notebook-screen{min-height:0}.visual-footer{display:none}#notebookScreen{align-items:flex-start;padding:10px}.map-chip{font-size:8px;padding:5px}.map-head{top:7px;left:7px}.map-tools{bottom:8px;right:8px}.map-bottom{bottom:7px;left:7px}.battle-box canvas{height:220px!important}}@media(max-width:400px){.sidebar{grid-template-columns:1fr}.sidebar .panel:nth-child(2){grid-row:auto}.sidebar-foot{grid-column:auto}.top-status .status-pair:nth-of-type(2){display:none}.production-list{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div id="app">
+<header class="topbar">
+<div class="brand"><div class="brand-emblem">⬡</div><div><div class="brand-main">MILOPS<span style="color:var(--gold)">/</span>IX</div><div class="brand-sub">TACTICAL OPERATIONS SYSTEM</div></div></div>
+<div class="top-line"></div><div class="mission-title">OPERATION: ECHO FRONT<small>SEKTOR K-17 · KAMPAGNE 01</small></div>
+<div class="top-status"><div class="status-pair">RUNDE<b id="roundRead">01</b></div><div class="status-pair">VERSORGUNG<b class="gold" id="supplyRead">12</b></div><div class="status-pair">EINHEITEN<b class="blue" id="unitRead">06 / 07</b></div><div class="signal"><i></i> UPLINK AKTIV</div></div>
+</header>
+<main class="content">
+<section class="board-wrap" id="boardWrap" aria-label="Hexagonales Gefechtsfeld">
+<canvas id="mapCanvas"></canvas>
+<div class="map-head"><div class="map-chip"><strong>◉</strong> KARTE // K-17</div><div class="map-chip" id="phaseChip">PHASE: BEFEHLE</div><div class="map-chip" id="weatherChip">WETTER: KLAR</div></div>
+<div class="marker-legend"><div><i class="allydot"></i> ALLIIERTE</div><div><i class="enemydot"></i> GEGNER</div><div><i class="objdot"></i> ZIELSEKTOR</div></div>
+<div class="map-bottom"><div class="map-chip">POS <span id="coordRead" class="map-coords">-- : --</span></div><div class="map-chip">LINKSKLICK AUSWÄHLEN / BEWEGEN / ANGREIFEN</div></div>
+<div class="map-tools"><button id="zoomIn" title="Hineinzoomen">+</button><button id="zoomOut" title="Herauszoomen">−</button><button id="zoomFit" title="Ansicht zentrieren">⌗</button></div>
+</section>
+<aside class="sidebar">
+<section class="panel"><div class="panel-head"><span>◈ EINSATZZIELE</span><span class="hbadge" id="missionStage">PRIORITÄT A</span></div><div class="panel-body"><div class="objectives" id="objectives"></div></div></section>
+<section class="panel"><div class="panel-head"><span>▣ EINHEITENDATEN</span><span class="hbadge" id="unitHeadBadge">BEREIT</span></div><div id="unitPanel" class="panel-body"></div></section>
+<section class="panel"><div class="panel-head"><span>✦ VERSTÄRKUNG</span><span class="hbadge" id="productionBadge">DEPOT</span></div><div class="panel-body"><div class="production-list" id="productionList"></div><div style="font:9px/1.5 var(--mono);color:#75949b;margin-top:9px">Produktion: an freiem, eigenen Stützpunkt · 1 Einheit/Runde</div></div></section>
+<section class="panel" style="flex:1;min-height:130px"><div class="panel-head"><span>≡ EINSATZPROTOKOLL</span><span class="hbadge">LIVE</span></div><div class="panel-body"><div class="events" id="eventLog"></div></div></section>
+<div class="sidebar-foot"><button class="btn amber" id="briefBtn">▤ BRIEFING</button><button class="btn primary" id="endTurnBtn">RUNDE BEENDEN ⇥</button></div>
+</aside>
+</main>
+<footer class="footer"><div class="ticker-label">◉ MILOPS FEED</div><div class="ticker" id="ticker">OPERATIVER LINK WIRD INITIALISIERT ...</div><div class="key">[H] HILFE · [LEERTASTE] RUNDE</div><button id="soundBtn" title="Ton umschalten">♫ TON AN</button><button id="helpBtn">? HILFE</button></footer>
+</div>
+<div id="notebookScreen" role="dialog" aria-label="MilOps Missionsbriefing"><div class="notebook-wrap"><div class="notebook-topline"><span>◈ MILITÄRISCHES OPERATIONSNOTEBOOK // SERIE IX</span><span>SICHERE VERBINDUNG · 38400 BAUD</span></div><div class="notebook"><div class="notebook-top"><div class="notebook-logo">MILOPS / IX<span>OPERATIONS TERMINAL · DEFENSE NETWORK</span></div><div class="notebook-id">KANAL: <strong>ALPHA–7</strong><br>ZUGRIFF: <strong>COMMAND</strong><br>CHIFFRE: 8F:2C:09</div></div><div class="notebook-screen"><div class="brief-visual"><canvas id="briefCanvas"></canvas><div class="visual-overlay" id="visualOverline">RECON CAM // SEKTOR K-17</div><div class="visual-footer" id="visualFoot">SIGNAL DECODED · TACTICAL FEED 001</div></div><div class="brief-info"><div class="brief-overline" id="briefOverline">EINGEHENDER BEFEHL // 001</div><div class="brief-title" id="briefTitle">VERBINDUNG WIRD HERGESTELLT</div><div class="brief-body"><span id="briefBody"></span><span class="cursor"></span></div><div class="brief-urgent" id="briefUrgent">GEHEIMHALTUNGSSTUFE: OPERATIV</div></div></div><div class="notebook-foot"><span class="phase" id="briefPhase">DECODIERUNG: 00%</span><div class="boot-progress"><span id="briefProgress" style="width:0"></span></div><button class="btn" id="skipBriefBtn">ÜBERSPRINGEN »</button><button class="btn primary" id="nextBriefBtn">WEITER ›</button></div></div><div class="notebook-hinge"></div><div class="notebook-base"></div></div></div>
+<div id="battleOverlay"><div class="battle-box"><div class="battle-head"><span>▶ LIVE-GEFECHTSÜBERTRAGUNG</span><span id="battleIndex">KONTAKT // K-17</span></div><canvas id="battleCanvas"></canvas><div class="battle-footer"><div class="battle-damage"><div id="attackerLabel">ANGREIFER</div><div id="defenderLabel">VERTEIDIGER</div></div><strong id="battleResult">GEFECHT LÄUFT</strong></div></div></div>
+<div id="toast"></div>
+<div id="helpOverlay"><div class="help-box"><h2>▤ FELDHANDBUCH</h2><p><b>MILOPS / IX</b> ist ein eigenständiges rundenbasiertes Hexfeld-Taktikspiel. Du kommandierst die blauen Einheiten; die rote Fraktion reagiert nach deinem Zug.</p><h3>STEUERUNG</h3><ul><li>Eigene Einheit anklicken; blau hervorgehobene Hexfelder sind erreichbare Felder.</li><li>Auf ein blaues Feld klicken: bewegen. Rote Kreise markieren angreifbare Ziele. Nach einer Bewegung darfst du noch feuern.</li><li>Einheiten können pro Runde einmal fahren und einmal angreifen, sofern Munition und Treibstoff reichen.</li><li>Mausrad oder +/−: Zoom. Rechte Maustaste / Ziehen auf leerer Karte: verschieben. Doppelklick auf ein Ziel ist nicht nötig.</li><li>[Leertaste] beendet die Runde, [H] öffnet diese Hilfe, [M] schaltet Audio um, [Esc] schliesst Meldungen.</li></ul><h3>TAKTIK & NACH SCHUB</h3><ul><li>Wälder und Höhenzüge bieten Deckung; Straßen beschleunigen die Bewegung. Gewässer sind nicht passierbar.</li><li>Infanterie ist im Wald robust. Artillerie feuert aus 2–3 Feldern Distanz und ist im Nahkampf verwundbar.</li><li>Jede Basis und jedes eigene Depot produziert Versorgung. Einmal je Runde kannst du eine neue Einheit dort stationieren.</li><li>Stützpunkte werden durch das Betreten mit einer eigenen Einheit erobert. Das Hauptziel kann im Verlauf der Mission geändert werden.</li><li>Bei Stützpunkten wird zu Beginn der eigenen Runde automatisch repariert und nachgeladen. Manuelle Feldversorgung kostet 3.</li></ul><button class="btn primary full" id="closeHelpBtn">ZURÜCK ZUM EINSATZ</button></div></div>
+<script>
+'use strict';
+(()=>{
+const $=id=>document.getElementById(id);
+const map=$('mapCanvas'),ctx=map.getContext('2d');
+const briefCanvas=$('briefCanvas'),bc=briefCanvas.getContext('2d');
+const fightCanvas=$('battleCanvas'),fc=fightCanvas.getContext('2d');
+const W=15,H=11,S=36,ROOT3=Math.sqrt(3),DIRECTIONS=[[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]];
+const factions={player:{color:'#67bcec',light:'#b7e7ff',dark:'#205a85'},enemy:{color:'#e47c68',light:'#ffd0a6',dark:'#833c37'}};
+const profiles={
+ scout:{name:'SPÄHER',id:'SC',hp:7,atk:3,def:1,speed:5,minRange:1,range:1,ammo:5,fuel:18,vision:4,cost:5},
+ tank:{name:'KAMPFPANZER',id:'KP',hp:11,atk:5,def:3,speed:3,minRange:1,range:1,ammo:5,fuel:15,vision:3,cost:8},
+ infantry:{name:'INFANTERIE',id:'IN',hp:8,atk:3,def:2,speed:3,minRange:1,range:1,ammo:6,fuel:30,vision:3,cost:4},
+ artillery:{name:'ARTILLERIE',id:'AR',hp:7,atk:6,def:1,speed:2,minRange:2,range:3,ammo:4,fuel:12,vision:3,cost:9},
+ support:{name:'VERSORGER',id:'VS',hp:8,atk:1,def:2,speed:3,minRange:1,range:1,ammo:3,fuel:18,vision:3,cost:6},
+ hunter:{name:'JAGDPANZER',id:'JP',hp:9,atk:5,def:2,speed:4,minRange:1,range:2,ammo:4,fuel:16,vision:3,cost:9}
+};
+const facilityDefs=[
+ {id:'bastion',q:1,r:8,label:'BASTION',type:'hauptquartier',owner:'player',income:3},
+ {id:'forge',q:4,r:7,label:'WERK SÜD',type:'fabrik',owner:'neutral',income:2},
+ {id:'echo',q:7,r:5,label:'RELAIS ECHO',type:'relais',owner:'enemy',income:2},
+ {id:'delta',q:10,r:8,label:'DEPOT DELTA',type:'depot',owner:'enemy',income:3},
+ {id:'omega',q:12,r:2,label:'BUNKER Ω',type:'hauptquartier',owner:'enemy',income:3},
+ {id:'radar',q:3,r:3,label:'RADAR 04',type:'radar',owner:'neutral',income:1},
+ {id:'works',q:10,r:4,label:'WERK NORD',type:'fabrik',owner:'enemy',income:2}
+];
+const key=(q,r)=>`${q},${r}`,inside=(q,r)=>q>=0&&r>=0&&q<W&&r<H;
+const hexDist=(a,b)=>Math.max(Math.abs(a.q-b.q),Math.abs(a.r-b.r),Math.abs((a.q+a.r)-(b.q+b.r)));
+const hash=(x,y,seed=1234)=>{let z=Math.sin((x+17.1)*127.1+(y+7.2)*311.7+seed*1.131)*43758.5453;return z-Math.floor(z)};
+const worldPos=(q,r)=>({x:ROOT3*S*(q+r/2),y:1.5*S*r});
+const roadSet=new Set([[1,8],[2,8],[3,8],[3,7],[4,7],[5,7],[5,6],[6,6],[7,5],[8,5],[9,5],[10,4],[11,3],[12,2],[3,3],[4,4],[5,5],[6,5],[8,6],[9,7],[10,8],[10,7],[10,6],[11,5],[11,4]].map(p=>key(...p)));
+let tiles=new Map(),facilities=[],units=[],uid=1,selected=null,hover=null,reachable=new Map(),visible=new Set(),explored=new Set();
+let round=1,supply=12,produced=false,stage=0,bonusActive=false,bonusDone=false,bonusFailed=false,turn='player',busy=false,ended=false,started=false,soundOn=true,winState=null;
+let pan={x:0,y:0},zoom=1,boardW=1000,boardH=600,moveAnim=null,combatAnim=null,toastTimer=null,events=[],lastUpdateStage=0,mouse={x:0,y:0},drag=null;
+let briefState=null,briefTicker=null,briefIndex=0,briefTime=0;
+let audioCtx=null;
+const formations=[['infantry',2,8],['scout',2,7],['tank',3,8],['tank',3,6],['artillery',1,9],['support',0,8]];
+const hostiles=[['tank',10,3],['infantry',11,2],['scout',8,4],['artillery',11,5],['tank',10,7],['infantry',12,3],['hunter',9,6],['scout',13,4]];
+function initWorld(){
+ tiles=new Map();for(let r=0;r<H;r++)for(let q=0;q<W;q++){
+  const v=hash(q,r,92),g=hash(q,r,49);let terrain=v>.80?'hill':v>.56?'forest':v<.10?'marsh':'plain';
+  if((q===7&&[0,1,2,3,8,9,10].includes(r))||(q===8&&[0,1,2,9,10].includes(r))||([0,1].includes(q)&&r===0))terrain='water';
+  if(roadSet.has(key(q,r)))terrain='road';
+  tiles.set(key(q,r),{q,r,terrain,variation:g});
+ }
+ facilities=facilityDefs.map(f=>({...f,initialOwner:f.owner}));
+ for(let f of facilities)tiles.get(key(f.q,f.r)).terrain='road';
+ // Clear starting sectors and staging areas.
+ for(let [type,q,r] of [...formations,...hostiles]){const t=tiles.get(key(q,r));if(t)t.terrain=t.terrain==='water'?'plain':t.terrain;}
+ units=[];uid=1;for(let [type,q,r] of formations)addUnit(type,'player',q,r);for(let [type,q,r] of hostiles)addUnit(type,'enemy',q,r);
+ round=1;supply=12;produced=false;stage=0;bonusActive=false;bonusDone=false;bonusFailed=false;turn='player';busy=false;ended=false;started=false;winState=null;selected=null;hover=null;reachable.clear();events=[];explored.clear();recalcFog();
+ logEvent('MilOps-Verbindung hergestellt.','good');logEvent('Operationsgebiet K-17 geladen.');
+ fitMap();updateUI();
+}
+function addUnit(type,side,q,r){const p=profiles[type];const u={id:uid++,type,side,q,r,hp:p.hp,ammo:p.ammo,fuel:p.fuel,moved:false,attacked:false};units.push(u);return u}
+function tileAt(q,r){return tiles.get(key(q,r))}
+function unitAt(q,r){return units.find(u=>u.q===q&&u.r===r&&u.hp>0)}
+function facilityAt(q,r){return facilities.find(f=>f.q===q&&f.r===r)}
+function neighbors(q,r){return DIRECTIONS.map(([dq,dr])=>({q:q+dq,r:r+dr})).filter(p=>inside(p.q,p.r))}
+function terrainCost(terrain,type){if(terrain==='water')return Infinity;if(terrain==='hill'&&type==='artillery')return 3;if(terrain==='hill')return 2;if(terrain==='forest')return type==='infantry'?1:2;if(terrain==='marsh')return type==='infantry'?2:3;return 1}
+function dijkstra(unit,ignoreUnits=false){
+ const max=Math.min(profiles[unit.type].speed,unit.fuel),todo=[{q:unit.q,r:unit.r,cost:0,path:[]}],seen=new Map([[key(unit.q,unit.r),{cost:0,path:[]}] ]);
+ while(todo.length){todo.sort((a,b)=>a.cost-b.cost);const cur=todo.shift();if(cur.cost>seen.get(key(cur.q,cur.r)).cost)continue;
+  for(let n of neighbors(cur.q,cur.r)){
+   if(!ignoreUnits && unitAt(n.q,n.r))continue;
+   const step=terrainCost(tileAt(n.q,n.r).terrain,unit.type),cost=cur.cost+step,k=key(n.q,n.r);
+   if(cost>max||!Number.isFinite(cost))continue;
+   if(!seen.has(k)||cost<seen.get(k).cost){const path=[...cur.path,{q:n.q,r:n.r}];seen.set(k,{cost,path});todo.push({...n,cost,path})}
+  }
+ }
+ seen.delete(key(unit.q,unit.r));return seen;
+}
+function recalcFog(){visible=new Set();for(const u of units.filter(u=>u.side==='player')){const vision=profiles[u.type].vision;for(let r=0;r<H;r++)for(let q=0;q<W;q++)if(hexDist(u,{q,r})<=vision)visible.add(key(q,r))}
+ for(let f of facilities.filter(f=>f.owner==='player'))for(let r=0;r<H;r++)for(let q=0;q<W;q++)if(hexDist(f,{q,r})<=2)visible.add(key(q,r));for(let k of visible)explored.add(k);
+}
+function setSelection(unit){selected=unit&&unit.side==='player'?unit:null;rebuildReachable();updateUI();if(selected)blip(520,.045)}
+function rebuildReachable(){reachable=selected&&!selected.moved&&turn==='player'&&!busy?dijkstra(selected):new Map()}
+function enemiesInRange(u,from=u){const p=profiles[u.type];return units.filter(v=>v.side!==u.side && (u.side==='enemy'||visible.has(key(v.q,v.r)))&&v.hp>0&&hexDist(from,v)>=p.minRange&&hexDist(from,v)<=p.range)}
+function canAttack(u,v){if(!u||!v||u.side===v.side||u.attacked||u.ammo<=0)return false;const d=hexDist(u,v),p=profiles[u.type];return d>=p.minRange&&d<=p.range&&(u.side==='enemy'||visible.has(key(v.q,v.r)))}
+function fitMap(){const all=[worldPos(0,0),worldPos(W-1,0),worldPos(0,H-1),worldPos(W-1,H-1)],minX=Math.min(...all.map(p=>p.x))-S,maxX=Math.max(...all.map(p=>p.x))+S,minY=-S,maxY=worldPos(0,H-1).y+S;
+ zoom=Math.max(.35,Math.min(1.7,Math.min((boardW-45)/(maxX-minX),(boardH-55)/(maxY-minY))));pan.x=(boardW-(minX+maxX)*zoom)/2;pan.y=(boardH-(minY+maxY)*zoom)/2;
+}
+function worldToScreen(q,r){const w=worldPos(q,r);return{x:w.x*zoom+pan.x,y:w.y*zoom+pan.y}}
+function screenToHex(x,y){const px=(x-pan.x)/zoom,py=(y-pan.y)/zoom;const q0=(ROOT3/3*px-py/3)/S,r0=(2/3*py)/S;let cx=q0,cz=r0,cy=-cx-cz;let rx=Math.round(cx),ry=Math.round(cy),rz=Math.round(cz);const dx=Math.abs(rx-cx),dy=Math.abs(ry-cy),dz=Math.abs(rz-cz);if(dx>dy&&dx>dz)rx=-ry-rz;else if(dy>dz)ry=-rx-rz;else rz=-rx-ry;return inside(rx,rz)?{q:rx,r:rz}:null}
+function fitCanvases(){const dpr=Math.min(2,window.devicePixelRatio||1);for(let [canvas,c] of [[map,ctx],[briefCanvas,bc],[fightCanvas,fc]]){const w=Math.max(1,canvas.clientWidth),h=Math.max(1,canvas.clientHeight);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);c.setTransform(dpr,0,0,dpr,0,0);}
+ boardW=map.clientWidth;boardH=map.clientHeight;fitMap();}
+function hexPath(c,x,y,r){c.beginPath();for(let i=0;i<6;i++){const a=(Math.PI/180)*(60*i-30),px=x+r*Math.cos(a),py=y+r*Math.sin(a);i?c.lineTo(px,py):c.moveTo(px,py)}c.closePath()}
+function polygon(c,pts,fill,stroke){c.beginPath();pts.forEach((p,i)=>i?c.lineTo(...p):c.moveTo(...p));c.closePath();if(fill){c.fillStyle=fill;c.fill()}if(stroke){c.strokeStyle=stroke;c.stroke()}}
+function drawHexTile(t,time){const p=worldToScreen(t.q,t.r),rad=S*zoom,k=key(t.q,t.r),shown=visible.has(k),known=explored.has(k),isHover=hover&&hover.q===t.q&&hover.r===t.r;
+ if(!known){hexPath(ctx,p.x,p.y,rad-1*zoom);ctx.fillStyle='#07131a';ctx.fill();ctx.strokeStyle='#233037';ctx.lineWidth=.9;ctx.stroke();return}
+ const colors={plain:['#40574d','#364e47'],forest:['#285146','#21443e'],hill:['#555f50','#464e45'],marsh:['#3b5a56','#2c4a4c'],water:['#1a4c5c','#1a3d4d'],road:['#57655e','#4b5b56']};const pair=colors[t.terrain];hexPath(ctx,p.x,p.y,rad-.7*zoom);ctx.fillStyle=pair[t.variation>.5?0:1];ctx.fill();ctx.strokeStyle='#1b3538';ctx.lineWidth=Math.max(1,.85*zoom);ctx.stroke();
+ ctx.save();hexPath(ctx,p.x,p.y,rad-1.1*zoom);ctx.clip();ctx.translate(p.x,p.y);ctx.scale(zoom,zoom);
+ const seed=t.variation;
+ if(t.terrain==='forest'){for(let j=0;j<4;j++){let dx=(hash(t.q+j,t.r,111)-.5)*43,dy=(hash(t.q,t.r+j,117)-.5)*43;polygon(ctx,[[dx,dy-11],[dx-7,dy+5],[dx+7,dy+5]],'#143b37','#30645a');ctx.strokeStyle='#6f96803f';ctx.beginPath();ctx.moveTo(dx,dy-8);ctx.lineTo(dx,dy+5);ctx.stroke()}}
+ if(t.terrain==='hill'){polygon(ctx,[[-27,14],[-7,-15],[11,7],[24,14]],'#76806b','#3e5549');polygon(ctx,[[-7,-15],[2,-1],[-15,-3]],'#c0bba066');polygon(ctx,[[4,13],[17,-5],[28,13]],'#6f786b')}
+ if(t.terrain==='marsh'){ctx.strokeStyle='#74aaa048';ctx.lineWidth=2;for(let j=0;j<4;j++){let y=8+j*4;ctx.beginPath();ctx.moveTo(-24+j*3,y-14);ctx.lineTo(14+j*2,y-14);ctx.stroke()}}
+ if(t.terrain==='water'){ctx.strokeStyle='#6db7bd44';ctx.lineWidth=1.5;for(let j=0;j<4;j++){const yy=-14+j*10+Math.sin(time*.0014+j+t.q)*2;ctx.beginPath();ctx.moveTo(-23+(j%2)*5,yy);ctx.quadraticCurveTo(-5,yy-5,13,yy);ctx.stroke()}}
+ if(t.terrain==='road'){ctx.strokeStyle='#a1a78c4e';ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(-37,23);ctx.lineTo(35,-22);ctx.stroke();ctx.strokeStyle='#c9c1a35a';ctx.lineWidth=1.4;ctx.setLineDash([6,8]);ctx.beginPath();ctx.moveTo(-33,20);ctx.lineTo(33,-19);ctx.stroke();ctx.setLineDash([])}
+ if(t.terrain==='plain'){ctx.strokeStyle='#a1bd9252';ctx.lineWidth=1.2;for(let i=0;i<3;i++){const x=hash(t.q+i,t.r,47)*46-23,y=hash(t.q,t.r+i,57)*37-18;ctx.beginPath();ctx.moveTo(x-2,y+4);ctx.lineTo(x,y-1);ctx.lineTo(x+3,y+3);ctx.stroke()}}
+ ctx.restore();
+ if(!shown){hexPath(ctx,p.x,p.y,rad-1);ctx.fillStyle='#020a10b5';ctx.fill();return}
+ if(selected&&selected.side==='player'&&reachable.has(k)){hexPath(ctx,p.x,p.y,rad-2*zoom);ctx.fillStyle='#52b3e13d';ctx.fill();ctx.strokeStyle='#77d1f3a0';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#8acee4';ctx.beginPath();ctx.arc(p.x,p.y,2.2*zoom,0,Math.PI*2);ctx.fill()}
+ if(isHover){hexPath(ctx,p.x,p.y,rad-2);ctx.strokeStyle='#d1f3e7';ctx.lineWidth=2;ctx.stroke()}
+}
+function drawFacility(f,time){if(!explored.has(key(f.q,f.r)) && !(f.id===(stage===0?'echo':'omega') || (f.id==='delta'&&bonusActive)))return;const p=worldToScreen(f.q,f.r),isVisible=visible.has(key(f.q,f.r)),s=zoom,c=f.owner==='player'?'#79c5ed':f.owner==='enemy'?'#e98975':'#d9c18e';ctx.save();ctx.translate(p.x,p.y);ctx.scale(s,s);if(!isVisible)ctx.globalAlpha=.4;
+ ctx.fillStyle='#091e27d4';ctx.beginPath();ctx.ellipse(0,10,23,11,0,0,Math.PI*2);ctx.fill();
+ if(f.type==='radar'||f.type==='relais'){
+  ctx.strokeStyle='#a3d4c8';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-9,7);ctx.lineTo(0,-21);ctx.lineTo(9,7);ctx.moveTo(-5,-4);ctx.lineTo(5,-4);ctx.stroke();ctx.fillStyle=c;ctx.beginPath();ctx.arc(0,-22,4,0,Math.PI*2);ctx.fill();ctx.strokeStyle=c+'99';ctx.lineWidth=1.3;ctx.beginPath();ctx.arc(0,-22,11,Math.PI*.15,Math.PI*.85);ctx.stroke();
+ }else{
+  polygon(ctx,[[-22,8],[-22,-6],[-10,-14],[12,-14],[23,-7],[23,9]],'#233d43','#86a39c');polygon(ctx,[[-19,-8],[-5,-21],[13,-21],[22,-8]],c+'88','#d1d9c9');ctx.fillStyle='#13272f';ctx.fillRect(-8,-6,16,15);ctx.fillStyle=c;ctx.fillRect(-5,-4,10,3);
+  if(f.type==='fabrik'){ctx.fillStyle='#537777';ctx.fillRect(-16,-19,7,11);ctx.fillRect(11,-20,6,12)}
+  if(f.type==='depot'){ctx.fillStyle='#6f8381';ctx.fillRect(-22,2,10,9);ctx.fillRect(13,2,10,9)}
+ }
+ ctx.strokeStyle=c;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(-20,16);ctx.lineTo(20,16);ctx.stroke();ctx.fillStyle='#08171d';ctx.fillRect(-28,-37,56,12);ctx.fillStyle=c;ctx.font='bold 7.5px monospace';ctx.textAlign='center';ctx.fillText(f.label,-0,-28);ctx.restore();
+ if(f.id===(stage===0?'echo':'omega')){ctx.save();ctx.strokeStyle='#e2c580';ctx.lineWidth=2;ctx.setLineDash([5,5]);ctx.beginPath();ctx.arc(p.x,p.y,35*s+Math.sin(time*.003)*2,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.restore()}
+ if(f.id==='delta'&&bonusActive&&!bonusDone&&!bonusFailed){ctx.strokeStyle='#c7eae0';ctx.lineWidth=1.5;ctx.strokeRect(p.x-24*s,p.y-25*s,48*s,47*s)}
+}
+function paintUnit(c,u,x,y,scale,ghost=false){const p=profiles[u.type],side=factions[u.side];c.save();c.translate(x,y);c.scale(scale,scale);if(ghost)c.globalAlpha=.25;
+ c.fillStyle='#030d13a0';c.beginPath();c.ellipse(0,15,26,9,0,0,Math.PI*2);c.fill();
+ const armour=side.dark,light=side.light,main=side.color;
+ if(u.type==='infantry'){
+  for(const dx of [-12,10]){c.fillStyle=armour;c.fillRect(dx-5,3,7,13);c.fillStyle=main;c.fillRect(dx-7,-9,12,15);c.fillStyle=light;c.beginPath();c.arc(dx-1,-13,7,Math.PI,0);c.fill();c.strokeStyle='#071924';c.lineWidth=3;c.beginPath();c.moveTo(dx+5,-1);c.lineTo(dx+14,-9);c.stroke()}
+ }else if(u.type==='artillery'){
+  c.fillStyle='#142632';c.fillRect(-22,-1,44,16);for(const xx of [-19,-8,4,15]){c.fillStyle='#7a908c';c.beginPath();c.arc(xx,10,4,0,Math.PI*2);c.fill()}
+  polygon(c,[[-18,1],[-10,-11],[15,-10],[21,1]],main,'#102d3a');c.fillStyle=armour;c.fillRect(-7,-11,15,7);c.strokeStyle=light;c.lineWidth=6;c.beginPath();c.moveTo(5,-6);c.lineTo(35,-22);c.stroke();c.strokeStyle='#122932';c.lineWidth=2;c.beginPath();c.moveTo(9,-7);c.lineTo(35,-22);c.stroke();
+ }else if(u.type==='support'){
+  c.fillStyle='#0c2029';c.fillRect(-22,6,44,12);for(const dx of [-15,14]){c.fillStyle='#889596';c.beginPath();c.arc(dx,15,5,0,Math.PI*2);c.fill()}polygon(c,[[-22,6],[-20,-13],[11,-16],[23,-7],[22,7]],main,'#153843');c.fillStyle='#143842';c.fillRect(8,-11,10,9);c.fillStyle='#eaf2de';c.fillRect(-9,-11,5,13);c.fillRect(-13,-7,13,5);
+ }else if(u.type==='scout'){
+  polygon(c,[[-25,7],[-14,-11],[7,-16],[24,-1],[19,12],[-17,12]],main,light);polygon(c,[[-7,-10],[9,-11],[17,-1],[-14,-1]],'#183a48');c.fillStyle='#0b2730';c.fillRect(-25,7,49,8);for(let xx of [-16,15]){c.fillStyle='#97a6a3';c.beginPath();c.arc(xx,15,6,0,Math.PI*2);c.fill()}
+ }else{
+  polygon(c,[[-27,4],[-25,-9],[21,-9],[27,5],[19,16],[-20,16]],'#162e37','#213c43');for(let xx of [-18,-7,5,17]){c.fillStyle='#7a9292';c.beginPath();c.arc(xx,10,3.5,0,Math.PI*2);c.fill()}
+  polygon(c,[[-24,1],[-16,-13],[15,-14],[24,0],[16,7],[-18,7]],main,light);polygon(c,[[-13,-7],[-5,-19],[7,-19],[15,-7]],armour,light);c.strokeStyle=light;c.lineWidth=u.type==='hunter'?6:5;c.beginPath();c.moveTo(7,-12);c.lineTo(u.type==='hunter'?38:32,u.type==='hunter'?-25:-19);c.stroke();c.strokeStyle='#1b3036';c.lineWidth=2;c.beginPath();c.moveTo(11,-12);c.lineTo(u.type==='hunter'?38:32,u.type==='hunter'?-25:-19);c.stroke();
+ }
+ c.fillStyle=light;c.beginPath();c.arc(-19,-5,2,0,Math.PI*2);c.fill();c.restore()}
+function drawMapUnits(time){for(const u of units){if(u.side==='enemy'&&!visible.has(key(u.q,u.r)))continue;let p=moveAnim&&moveAnim.unit===u?moveAnim.point:worldToScreen(u.q,u.r);if(!p)continue;const s=zoom*.88;let alpha=1;
+  if(selected===u){ctx.strokeStyle='#a9f4f9';ctx.lineWidth=2;ctx.setLineDash([6,5]);ctx.beginPath();ctx.ellipse(p.x,p.y,32*zoom+Math.sin(time*.006)*2,21*zoom,0,0,Math.PI*2);ctx.stroke();ctx.setLineDash([])}
+  paintUnit(ctx,u,p.x,p.y,s);
+  const barW=38*zoom,barY=p.y+23*zoom;ctx.fillStyle='#0a1d22';ctx.fillRect(p.x-barW/2-1,barY-1,barW+2,5*zoom+1);ctx.fillStyle=u.side==='player'?'#7cd7bb':'#fa9278';ctx.fillRect(p.x-barW/2,barY,barW*(u.hp/profiles[u.type].hp),3.5*zoom);
+  if(zoom>.56){ctx.font=`bold ${Math.max(8,9*zoom)}px monospace`;ctx.textAlign='center';ctx.fillStyle='#e8f1e4';ctx.fillText(profiles[u.type].id,p.x,p.y-23*zoom)}
+  if(u.side==='player'&&(u.moved||u.attacked)){ctx.fillStyle=u.moved&&u.attacked?'#646c76':'#e6c97f';ctx.beginPath();ctx.arc(p.x+24*zoom,p.y-20*zoom,4*zoom,0,Math.PI*2);ctx.fill()}
+ }
+ if(selected&&!selected.attacked&&selected.ammo>0){for(const enemy of enemiesInRange(selected)){
+  const p=worldToScreen(enemy.q,enemy.r);ctx.strokeStyle='#ff977f';ctx.lineWidth=2.8;ctx.beginPath();ctx.ellipse(p.x,p.y,34*zoom+Math.sin(time*.01)*2,24*zoom,0,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#ffe6d0';ctx.font=`bold ${Math.max(9,11*zoom)}px monospace`;ctx.textAlign='center';ctx.fillText('TARGET',p.x,p.y-31*zoom)
+ }}
+}
+function renderMap(time){ctx.clearRect(0,0,boardW,boardH);const bg=ctx.createLinearGradient(0,0,boardW,boardH);bg.addColorStop(0,'#203b3b');bg.addColorStop(1,'#0b242d');ctx.fillStyle=bg;ctx.fillRect(0,0,boardW,boardH);
+ ctx.strokeStyle='#90bdba0a';ctx.lineWidth=1;for(let x=(pan.x%45+45)%45;x<boardW;x+=45){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,boardH);ctx.stroke()}for(let y=(pan.y%45+45)%45;y<boardH;y+=45){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(boardW,y);ctx.stroke()}
+ for(let t of tiles.values())drawHexTile(t,time);
+ for(let f of facilities)drawFacility(f,time);
+ drawMapUnits(time);
+ // Coordinate ruler, decorative map corners.
+ ctx.strokeStyle='#72b5b76c';ctx.lineWidth=1;const m=15;for(let [x,sx,y,sy] of [[m,1,m,1],[boardW-m,-1,m,1],[m,1,boardH-m,-1],[boardW-m,-1,boardH-m,-1]]){ctx.beginPath();ctx.moveTo(x+sx*19,y);ctx.lineTo(x,y);ctx.lineTo(x,y+sy*19);ctx.stroke()}
+}
+function logEvent(message,type=''){events.unshift({round,message,type});events=events.slice(0,7);$('ticker').textContent=message;updateLog()}
+function updateLog(){$('eventLog').innerHTML=events.map(e=>`<div class="event ${e.type}"><span class="tick">R${String(e.round).padStart(2,'0')}</span><span>${e.message}</span></div>`).join('')}
+function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),2200)}
+function updateUI(){
+ $('roundRead').textContent=String(round).padStart(2,'0');$('supplyRead').textContent=String(supply).padStart(2,'0');$('unitRead').textContent=String(units.filter(u=>u.side==='player').length).padStart(2,'0')+' / '+String(units.filter(u=>u.side==='enemy').length).padStart(2,'0');$('phaseChip').textContent='PHASE: '+(turn==='player'?'BEFEHLE':'FEINDZUG');$('endTurnBtn').disabled=busy||turn!=='player'||ended||!started;
+ $('missionStage').textContent=stage===0?'PRIORITÄT A':'PRIORITÄT A / B';
+ const echo=facilities.find(f=>f.id==='echo'),omega=facilities.find(f=>f.id==='omega'),delta=facilities.find(f=>f.id==='delta');
+ let goal=stage===0?{t:'RELAIS ECHO EINNEHMEN',d:'Übernimm die Sendestation im Sektor H6. Schlüssel zur Frontaufklärung.',done:false}:{t:'BUNKER OMEGA EINNEHMEN',d:'Stoße nach Nordosten vor und sichere den feindlichen Kommandobunker.',done:omega.owner==='player'};
+ let html=`<div class="objective ${goal.done?'done':''}"><div class="mark">${goal.done?'☑':'◇'}</div><div><div class="ob-title">${goal.t}</div><div class="ob-info">${goal.d}</div></div></div>`;
+ if(stage>0)html+=`<div class="objective done"><div class="mark">☑</div><div><div class="ob-title">RELAIS ECHO GESICHERT</div><div class="ob-info">Aufklärungskanal erfolgreich aktiviert.</div></div></div>`;
+ if(bonusActive)html+=`<div class="objective bonus ${bonusDone?'done':''}"><div class="mark">${bonusDone?'☑':bonusFailed?'✕':'✧'}</div><div><div class="ob-title">${bonusDone?'BONUS ERFÜLLT':bonusFailed?'BONUS VERPASST':'BONUS: DEPOT DELTA'}</div><div class="ob-info">${bonusDone?'+7 Versorgungseinheiten erhalten.':bonusFailed?'Das Zeitfenster für die Einnahme ist abgelaufen.':'Erobere das Treibstoffdepot bis einschliesslich Runde 9. Belohnung: +7 Versorgung.'}</div></div></div>`;
+ $('objectives').innerHTML=html;
+ if(!selected||!units.includes(selected)){$('unitPanel').innerHTML='<div class="empty-unit">◈<br>EINHEIT AUF DER KARTE WÄHLEN<br><span style="color:#557b81">BLAU = FAHRBEREICH · ROT = ANGRIFF</span></div>';$('unitHeadBadge').textContent='KEINE AUSWAHL'}
+ else{const u=selected,p=profiles[u.type],tile=tileAt(u.q,u.r),canSupply=!u.resupplied&&supply>=3&&(u.hp<p.hp||u.ammo<p.ammo||u.fuel<p.fuel);$('unitHeadBadge').textContent=`${p.id}-${String(u.id).padStart(2,'0')}`;
+ $('unitPanel').innerHTML=`<div class="unit-head"><div class="unit-portrait"><canvas id="portrait" width="160" height="130"></canvas></div><div><div class="unit-name">${p.name}</div><div class="unit-meta">${p.id}–${String(u.id).padStart(2,'0')} / SEKTOR ${String.fromCharCode(65+u.q)}${u.r+1}<br>${tile.terrain.toUpperCase()} · ${u.moved?'BEWEGT':'FAHRBEREIT'}<br>${u.attacked?'WAFFE BENUTZT':'FEUERBEREIT'}</div></div></div><div class="stat-label"><span>STRUKTURINTEGRITÄT</span><span>${u.hp} / ${p.hp}</span></div><div class="health-track"><div class="health-fill" style="width:${100*u.hp/p.hp}%;background:${u.hp<=p.hp*.35?'#d37b69':''}"></div></div><div class="stats-grid"><div>BEWEGUNG<b>${u.moved?0:Math.min(p.speed,u.fuel)}</b></div><div>MUNITION<b>${u.ammo}/${p.ammo}</b></div><div>TREIBSTOFF<b>${u.fuel}</b></div></div><div class="unit-actions"><button id="holdUnitBtn" class="btn" ${u.moved&&u.attacked?'disabled':''}>WARTEN</button><button id="supplyUnitBtn" class="btn amber" ${!canSupply?'disabled':''}>VERSORGEN −3</button></div>`;
+ const pc=$('portrait'),pctx=pc.getContext('2d');pctx.clearRect(0,0,160,130);pctx.strokeStyle='#72a6a72a';for(let i=0;i<160;i+=16){pctx.beginPath();pctx.moveTo(i,0);pctx.lineTo(i,130);pctx.stroke()}paintUnit(pctx,u,80,77,2.25);
+ $('holdUnitBtn').onclick=()=>{if(busy||turn!=='player'||briefState)return;u.moved=true;u.attacked=true;logEvent(`${p.name} erwartet weitere Befehle.`);setSelection(null)};
+ $('supplyUnitBtn').onclick=()=>{if(busy||turn!=='player'||briefState)return;if(supply<3||u.resupplied)return;supply-=3;u.hp=Math.min(p.hp,u.hp+3);u.ammo=p.ammo;u.fuel=p.fuel;u.resupplied=true;u.moved=true;u.attacked=true;blip(730,.1);logEvent(`${p.name} durch Feldlogistik versorgt.`,'good');setSelection(null)};
+ }
+ const ownBases=facilities.filter(f=>f.owner==='player'&&!unitAt(f.q,f.r));$('productionBadge').textContent=produced?'FERTIG':ownBases.length?'BEREIT':'BLOCKIERT';
+ $('productionList').innerHTML=['infantry','scout','tank','artillery','support','hunter'].map(type=>{const p=profiles[type];return `<button class="buy-btn" data-buy="${type}" ${produced||!ownBases.length||supply<p.cost||turn!=='player'||busy||ended?'disabled':''}><span><span class="label">${p.name}</span><small>${p.id} · LP ${p.hp}</small></span><span class="cost">◈ ${p.cost}</span></button>`}).join('');
+ for(const b of $('productionList').querySelectorAll('[data-buy]'))b.onclick=()=>produce(b.dataset.buy);
+}
+function produce(type){if(busy||turn!=='player'||produced||briefState||ended)return;const p=profiles[type],bases=facilities.filter(f=>f.owner==='player'&&!unitAt(f.q,f.r));if(supply<p.cost||!bases.length)return;const base=bases.find(f=>f.id==='bastion')||bases[0];supply-=p.cost;produced=true;const u=addUnit(type,'player',base.q,base.r);u.moved=true;u.attacked=true;recalcFog();setSelection(u);logEvent(`${p.name} bei ${base.label} aufgestellt.`,'good');blip(650,.12);updateUI()}
+function sound(freq=500,duration=.1,wave='sine',volume=.045,slide=0){if(!soundOn)return;try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();const o=audioCtx.createOscillator(),g=audioCtx.createGain(),t=audioCtx.currentTime;o.type=wave;o.frequency.setValueAtTime(Math.max(50,freq),t);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(50,freq+slide),t+duration);g.gain.setValueAtTime(volume,t);g.gain.exponentialRampToValueAtTime(.001,t+duration);o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+duration+.01)}catch(e){}}
+function blip(f=660,d=.07){sound(f,d,'triangle',.035);setTimeout(()=>sound(f*1.32,.04,'sine',.012),72)}
+function rattle(){sound(72,.28,'sawtooth',.06,-20);sound(230,.16,'triangle',.04,-130)}
+function handleMapClick(pos){if(!started||briefState||ended||busy||turn!=='player')return;
+ const unit=unitAt(pos.q,pos.r);if(unit&&unit.side==='player'){setSelection(unit);return}
+ if(selected){if(unit&&unit.side==='enemy'){
+   if(canAttack(selected,unit)){const attacker=selected;runPlayerAttack(attacker,unit)}else toast('ZIEL NICHT IN WAFFENREICHWEITE');return;
+  }
+  const destination=reachable.get(key(pos.q,pos.r));if(destination&&!unit){runPlayerMove(selected,destination);return}
+ }
+ if(unit&&unit.side==='enemy'){toast(visible.has(key(pos.q,pos.r))?`FEINDKONTAKT: ${profiles[unit.type].name}`:'KEIN SICHTKONTAKT');return}
+ setSelection(null);
+}
+async function animateMovement(u,path){if(!path.length)return;let old={q:u.q,r:u.r};for(const step of path){const a=worldToScreen(old.q,old.r),b=worldToScreen(step.q,step.r),t0=performance.now();await new Promise(resolve=>{
+  const tick=t=>{let f=Math.min(1,(t-t0)/130);moveAnim={unit:u,point:{x:a.x+(b.x-a.x)*f,y:a.y+(b.y-a.y)*f}};if(f>=1){u.q=step.q;u.r=step.r;moveAnim=null;resolve()}else requestAnimationFrame(tick)};requestAnimationFrame(tick)
+ });old=step}moveAnim=null;
+}
+async function runPlayerMove(u,route){busy=true;rebuildReachable();updateUI();sound(180,.09,'sawtooth',.018,100);await animateMovement(u,route.path);u.fuel=Math.max(0,u.fuel-route.cost);u.moved=true;recalcFog();busy=false;
+ const capture=handleCapture(u);rebuildReachable();updateUI();if(capture==='victory')return;
+ if(!units.includes(u))setSelection(null);else setSelection(u);
+}
+function hitDamage(a,b,returnFire=false){let atk=profiles[a.type].atk,p=profiles[b.type],defTerrain=tileAt(b.q,b.r).terrain;let cover=(defTerrain==='forest'||defTerrain==='hill')?1:0;if(b.type==='infantry'&&defTerrain==='forest')cover++;
+ const variation=Math.floor(hash(a.id,b.id,round*7+Math.floor(Math.random()*110))*3)-1;
+ return Math.max(1,Math.min(7,Math.round(atk*.85+variation-p.def*.36-cover-(returnFire?1:0))));
+}
+async function runPlayerAttack(a,b){busy=true;rebuildReachable();updateUI();await battle(a,b);busy=false;recalcFog();if(units.includes(a))setSelection(a);else setSelection(null);checkGameOver();updateUI()}
+function handleCapture(u){const f=facilityAt(u.q,u.r);if(!f||f.owner===u.side)return null;const previous=f.owner;f.owner=u.side;blip(u.side==='player'?880:220,.14);
+ logEvent(`${f.label} ${u.side==='player'?'eingenommen':'vom Gegner besetzt'}.`,u.side==='player'?'good':'enemy');
+ if(u.side==='enemy'&&f.id==='bastion'){missionEnd(false,'BASTION VERLOREN','Der feindliche Verband hat unser Hauptquartier überrannt. Die Verbindung zur Operationsführung ist abgebrochen.');return 'defeat'}
+ if(u.side==='player'&&f.id==='echo'&&stage===0){stage=1;supply+=3;spawnAt('scout','enemy',13,5);logEvent('Neue Operationsbefehle eingetroffen.','alert');showBrief([{over:'MISSIONSUPDATE // 014',title:'PRIORITÄTSWECHSEL',body:'Relais ECHO ist unter unserer Kontrolle. Die entschlüsselten Daten offenbaren die Position der gegnerischen Kommandostelle.\n\nNEUES HAUPTZIEL:\nBunker OMEGA im Nordosten einnehmen.\n\nFeindliche Reserven werden mobilisiert. +3 Versorgung freigegeben.',urgent:'BEFEHLSÄNDERUNG · OMEGA IST JETZT PRIORITÄTSZIEL',scene:'alert'}],'update')}
+ if(u.side==='player'&&f.id==='omega'&&stage===1){missionEnd(true,'OPERATION ERFOLGREICH','Bunker OMEGA ist gesichert. Das feindliche Führungsnetz ist zusammengebrochen. Die ECHO-FRONT steht unter unserer Kontrolle.');return 'victory'}
+ if(u.side==='player'&&f.id==='delta'&&bonusActive&&!bonusDone&&!bonusFailed&&round<=9){bonusDone=true;supply+=7;logEvent('Bonusziel DELTA erfüllt: +7 Versorgung.','good');showBrief([{over:'SEKUNDÄRZIEL // ERFÜLLT',title:'DEPOT DELTA GESICHERT',body:'Unsere Verbände haben den Nachschubknoten DELTA rechtzeitig übernommen.\n\nDie erbeuteten Treibstoff- und Munitionsreserven werden den eigenen Depots zugeführt.\n\nVERSORGUNGSGUTSCHRIFT: +7',urgent:'NACHSCHUBKANAL GEÖFFNET',scene:'victory'}],'update')}
+ updateUI();return null;
+}
+function spawnAt(type,side,q,r){if(!inside(q,r)||unitAt(q,r)||tileAt(q,r).terrain==='water')return null;const u=addUnit(type,side,q,r);if(side==='enemy'){u.moved=true;u.attacked=true}recalcFog();return u}
+function missionEnd(won,title,body){if(ended)return;ended=true;winState=won;busy=false;logEvent(title,won?'good':'enemy');showBrief([{over:won?'EINSATZBERICHT // ERFOLG':'EINSATZBERICHT // VERLUST',title,body:body+`\n\nABSCHLUSSDATEN:\nRunden: ${round}  |  Verbündete: ${units.filter(u=>u.side==='player').length}  |  Feinde: ${units.filter(u=>u.side==='enemy').length}`,urgent:won?'MISSION KOMPLETT · KANAL GESICHERT':'MISSION GESCHEITERT · SIGNAL ABGEBROCHEN',scene:won?'victory':'alarm'}],'outro');updateUI()}
+function checkGameOver(){if(ended)return;if(!units.some(u=>u.side==='player'))missionEnd(false,'ALLE EINHEITEN VERLOREN','Die Operationsgruppe wurde vollständig aufgerieben. Es sind keine einsatzfähigen Verbände mehr vorhanden.')}
+function repairOnBase(side){for(let u of units.filter(u=>u.side===side)){const f=facilityAt(u.q,u.r),p=profiles[u.type];if(f&&f.owner===side){u.hp=Math.min(p.hp,u.hp+2);u.ammo=p.ammo;u.fuel=p.fuel}}}
+async function endTurn(){if(busy||turn!=='player'||ended||briefState||!started)return;
+ selected=null;reachable.clear();turn='enemy';busy=true;updateUI();logEvent('Feindliche Zugphase eingeleitet.','enemy');sound(300,.18,'sawtooth',.023,-180);
+ await new Promise(r=>setTimeout(r,520));
+ for(const u of [...units.filter(u=>u.side==='enemy')]){
+  if(ended)break;if(!units.includes(u))continue;
+  await enemyAction(u);
+  if(!units.some(p=>p.side==='player')){checkGameOver();break}
+  await new Promise(r=>setTimeout(r,105));
+ }
+ if(ended){busy=false;return}
+ round++;turn='player';produced=false;for(const u of units){u.moved=false;u.attacked=false;u.resupplied=false}repairOnBase('player');repairOnBase('enemy');
+ const income=3+facilities.filter(f=>f.owner==='player'&&f.id!=='bastion').reduce((a,f)=>a+f.income,0);supply+=income;
+ recalcFog();busy=false;updateUI();logEvent(`Runde ${round}: +${income} Versorgung. Regeneration abgeschlossen.`,'good');blip(530,.1);
+ if(round===3&&!bonusActive){bonusActive=true;if(facilities.find(f=>f.id==='delta').owner==='player'){bonusDone=true;supply+=7;logEvent('Bonusziel DELTA bereits gesichert: +7 Versorgung.','good')}else{logEvent('Zusatzbefehl: Depot DELTA sichern.','alert');showBrief([{over:'SONDERBEFEHL // 008',title:'OPPORTUNITÄTSZIEL',body:'Aufklärung meldet eine ungeschützte Versorgungskette im Südosten. Der feindliche Treibstoffknoten DELTA ist für kurze Zeit verwundbar.\n\nBONUSZIEL:\nDepot DELTA bis einschließlich Runde 9 besetzen.\n\nERFOLGSPRÄMIE: +7 Versorgungseinheiten.',urgent:'ZEITFENSTER BIS ENDE RUNDE 09',scene:'convoy'}],'update')}}
+ if(round===6&&lastUpdateStage<6){lastUpdateStage=6;spawnAt('hunter','enemy',13,6);spawnAt('infantry','enemy',14,3);logEvent('Achtung! Feindliche Verstärkung im Ostsektor.','alert');showBrief([{over:'DRINGEND // FEINDLAGE',title:'ROTALARM OSTFLANKE',body:'Neue gepanzerte Kontakte wurden am östlichen Kartenrand identifiziert. Die Gegenseite wirft ihre operative Reserve in die Schlacht.\n\nBewegungsmuster legen einen Vorstoß in Richtung Relais ECHO nahe.\n\nBEFEHL: Hauptziel aufrechterhalten. Eigene Versorgung sichern.',urgent:'BEDROHUNGSLAGE ERHÖHT · 2 FEINDVERBÄNDE',scene:'alarm'}],'update')}
+ if(round>9&&bonusActive&&!bonusDone&&!bonusFailed){bonusFailed=true;logEvent('Bonusziel DELTA: Zeitfenster verstrichen.','alert');toast('BONUSZIEL VERPASST')}
+ updateUI();
+}
+function bestEnemyTarget(u){const attackers=units.filter(v=>v.side==='player'&&canAttack(u,v));attackers.sort((a,b)=>(a.hp-profiles[a.type].hp*.4)-(b.hp-profiles[b.type].hp*.4));return attackers[0]||null}
+async function enemyAction(u){if(u.ammo>0){const t=bestEnemyTarget(u);if(t){await battle(u,t);checkGameOver();return}}
+ if(u.fuel<=0)return;
+ const reachableEnemy=dijkstra(u),targets=[...units.filter(v=>v.side==='player').map(v=>({q:v.q,r:v.r,weight:0})),...facilities.filter(f=>f.owner==='player').map(f=>({q:f.q,r:f.r,weight:1.2}))];if(!targets.length)return;
+ const score=(pos)=>{
+  let best=1000;for(const t of targets){let d=hexDist(pos,t)+t.weight;if(d<best)best=d}const terrain=tileAt(pos.q,pos.r).terrain;const cover=terrain==='forest'||terrain==='hill'?.5:0;
+  // Artillery prefers standoff distance.
+  if(u.type==='artillery'){const nearest=Math.min(...units.filter(v=>v.side==='player').map(v=>hexDist(v,pos)));return Math.abs(nearest-2.5)*2-cover}
+  return best-cover;
+ };
+ let choice={q:u.q,r:u.r},best=score(u);
+ for(let [k,opt] of reachableEnemy){const [q,r]=k.split(',').map(Number),s=score({q,r})+opt.cost*.03+hash(q,r,u.id)*.11;if(s<best-.1){best=s;choice={q,r}}}
+ if(choice.q!==u.q||choice.r!==u.r){const path=reachableEnemy.get(key(choice.q,choice.r));await animateMovement(u,path.path);u.fuel=Math.max(0,u.fuel-path.cost);u.moved=true;handleCapture(u);recalcFog();if(ended)return}
+ const target=u.ammo>0?bestEnemyTarget(u):null;if(target)await battle(u,target);
+}
+async function battle(a,b){if(!units.includes(a)||!units.includes(b)||!canAttack(a,b))return;
+ const dmg=hitDamage(a,b),remaining=b.hp-dmg,pb=profiles[b.type],d=hexDist(a,b),pa=profiles[a.type],counter=remaining>0&&b.ammo>0&&d>=pb.minRange&&d<=pb.range?hitDamage(b,a,true):0;
+ a.ammo--;a.attacked=true;if(counter)b.ammo--;
+ $('attackerLabel').innerHTML=`<span style="color:${factions[a.side].light}">${pa.name}</span> <span style="color:#869e9d">${pa.id}-${a.id}</span>`;
+ $('defenderLabel').innerHTML=`<span style="color:${factions[b.side].light}">${pb.name}</span> <span style="color:#869e9d">${pb.id}-${b.id}</span>`;
+ $('battleResult').textContent='FEUER ERÖFFNET';$('battleIndex').textContent=`${String.fromCharCode(65+b.q)}${b.r+1} // KONTAKT`;
+ $('battleOverlay').classList.add('show');
+ const dpr=Math.min(2,window.devicePixelRatio||1),fw=fightCanvas.clientWidth,fh=fightCanvas.clientHeight;fightCanvas.width=Math.round(fw*dpr);fightCanvas.height=Math.round(fh*dpr);fc.setTransform(dpr,0,0,dpr,0,0);
+ sound(100,.23,'sawtooth',.055,-60);
+ await new Promise(resolve=>{combatAnim={a,b,dmg,counter,started:performance.now(),duration:1620,resolve,played:false,retPlayed:false}});
+ b.hp=Math.max(0,b.hp-dmg);if(b.hp>0&&counter)a.hp=Math.max(0,a.hp-counter);
+ logEvent(`${pa.name} → ${pb.name}: −${dmg}${counter?` / Gegenfeuer −${counter}`:''}.`,a.side==='player'?'good':'enemy');
+ if(b.hp===0){units=units.filter(u=>u!==b);logEvent(`${pb.name} ausgeschaltet.`,a.side==='player'?'good':'enemy');if(selected===b)selected=null}
+ if(a.hp===0){units=units.filter(u=>u!==a);logEvent(`${pa.name} im Gegenfeuer zerstört.`,a.side==='player'?'enemy':'good');if(selected===a)selected=null}
+ $('battleOverlay').classList.remove('show');recalcFog();rebuildReachable();updateUI();
+}
+function drawFight(t){if(!combatAnim)return;const {a,b,dmg,counter}=combatAnim,w=fightCanvas.clientWidth,h=fightCanvas.clientHeight,progress=Math.min(1,t/1620);
+ fc.clearRect(0,0,w,h);const sky=fc.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#0c303a');sky.addColorStop(.66,'#4a6663');sky.addColorStop(1,'#304d48');fc.fillStyle=sky;fc.fillRect(0,0,w,h);
+ fc.strokeStyle='#9bdcd12b';fc.lineWidth=1;for(let x=0;x<w;x+=28){fc.beginPath();fc.moveTo(x,0);fc.lineTo(x,h);fc.stroke()}for(let y=0;y<h;y+=28){fc.beginPath();fc.moveTo(0,y);fc.lineTo(w,y);fc.stroke()}
+ const ground=h*.77,mid=w/2;
+ polygon(fc,[[0,ground-20],[w*.1,ground-105],[w*.24,ground-50],[w*.38,ground-116],[w*.55,ground-45],[w*.7,ground-88],[w*.89,ground-66],[w,ground-15],[w,h],[0,h]],'#203f42','#477774');
+ polygon(fc,[[0,ground+5],[w*.2,ground-10],[w*.43,ground+8],[w*.67,ground-7],[w,ground+15],[w,h],[0,h]],'#4e6658','#608271');
+ for(let j=0;j<36;j++){const x=hash(j,2)*w,y=ground+(hash(j,13)*.3)*h;fc.strokeStyle='#a8b4972b';fc.beginPath();fc.moveTo(x,y);fc.lineTo(x-6,y-10);fc.stroke()}
+ const x1=w*.2,x2=w*.8,sy=ground-30,scale=Math.min(w/450,1.75),tNow=performance.now();
+ fc.save();fc.globalAlpha=.16;paintUnit(fc,a,x1+8,sy+10,scale*2.25);paintUnit(fc,b,x2+8,sy+10,scale*2.25);fc.restore();
+ fc.save();fc.translate(x1,sy);fc.scale(scale*2,scale*2);paintUnit(fc,a,0,0,1);fc.restore();
+ fc.save();fc.translate(x2,sy);fc.scale(-scale*2,scale*2);paintUnit(fc,b,0,0,1);fc.restore();
+ // Impact cycles: outgoing shell, flash and a potential counter-shot.
+ let shotT=(t-230)/570;if(shotT>0&&shotT<1){const f=shotT,px=x1+(x2-x1)*f,py=sy-32-Math.sin(Math.PI*f)*h*.17;fc.strokeStyle='#f9db9f';fc.lineWidth=3;fc.beginPath();fc.moveTo(px-28,py+8);fc.lineTo(px,py);fc.stroke();fc.fillStyle='#fff8c3';fc.beginPath();fc.arc(px,py,4+3*Math.sin(t*.03),0,Math.PI*2);fc.fill()}
+ if(t>790&&t<1250){let s=(t-790)/460,x=x2,y=sy-15;fc.save();fc.globalAlpha=1-s;for(let j=0;j<12;j++){const ang=Math.PI*2*j/12,dist=(15+s*55)*(j%2?.65:1);fc.strokeStyle=j%2?'#ffd4a1':'#f69b64';fc.lineWidth=4+4*(1-s);fc.beginPath();fc.moveTo(x+Math.cos(ang)*dist*.18,y+Math.sin(ang)*dist*.18);fc.lineTo(x+Math.cos(ang)*dist,y+Math.sin(ang)*dist);fc.stroke()}fc.restore();fc.fillStyle='#fbeac7';fc.font='bold 24px monospace';fc.textAlign='center';fc.fillText(`−${dmg}`,x,sy-72-s*32)}
+ if(counter){const f=(t-1070)/330;if(f>0&&f<1){const px=x2+(x1-x2)*f,py=sy-26-Math.sin(Math.PI*f)*40;fc.fillStyle='#ffba94';fc.beginPath();fc.arc(px,py,4,0,Math.PI*2);fc.fill()}if(t>1350){fc.font='bold 23px monospace';fc.textAlign='center';fc.fillStyle='#efb38d';fc.fillText(`−${counter}`,x1,sy-89)}}
+ fc.fillStyle='#05151cdd';fc.fillRect(0,0,w,33);fc.font='bold 11px monospace';fc.textAlign='left';fc.fillStyle=factions[a.side].light;fc.fillText(`${a.side==='player'?'BLAU':'ROT'} // ${profiles[a.type].name}`,13,22);fc.textAlign='right';fc.fillStyle=factions[b.side].light;fc.fillText(`${b.side==='player'?'BLAU':'ROT'} // ${profiles[b.type].name}`,w-13,22);
+ fc.fillStyle='#bcd9cb';fc.font='10px monospace';fc.textAlign='center';fc.fillText('◈  MILOPS LIVE LINK  /  SIMULATED CAMERA  ◈',w/2,h-11);
+}
+function typeText(){if(!briefState)return;const page=briefState.pages[briefIndex],body=$('briefBody');if(body.textContent.length<page.body.length){body.textContent=page.body.slice(0,body.textContent.length+(body.textContent.length<25?1:2));if(body.textContent.length%5===0)sound(590,.016,'square',.007)}
+ else{clearInterval(briefTicker);briefTicker=null;$('nextBriefBtn').textContent=briefIndex===briefState.pages.length-1?(briefState.mode==='outro'?'NEU STARTEN':briefState.mode==='intro'?'EINSATZ STARTEN':'BESTÄTIGEN'):'WEITER ›'}
+ $('briefProgress').style.width=`${Math.min(100,body.textContent.length/page.body.length*100)}%`;$('briefPhase').textContent=`DECODIERUNG: ${String(Math.floor(body.textContent.length/Math.max(1,page.body.length)*100)).padStart(2,'0')}%`}
+function briefPage(index){if(!briefState)return;clearInterval(briefTicker);briefIndex=index;const p=briefState.pages[index];$('briefOverline').textContent=p.over;$('briefTitle').textContent=p.title;$('briefBody').textContent='';$('briefUrgent').textContent=p.urgent;$('briefProgress').style.width='0';$('briefPhase').textContent='DECODIERUNG: 00%';$('visualOverline').textContent='OPTISCHE AUFKLÄRUNG // '+p.scene.toUpperCase();$('visualFoot').textContent='SECURE MILOPS NET · PACKET '+String(index+1).padStart(3,'0');$('nextBriefBtn').textContent='WEITER ›';$('skipBriefBtn').textContent=briefState.mode==='outro'?'NEU STARTEN':'ÜBERSPRINGEN »';briefTime=performance.now();briefTicker=setInterval(typeText,21);blip(680,.05)}
+function showBrief(pages,mode='update'){if(!pages.length)return;briefState={pages,mode};$('notebookScreen').classList.remove('hidden');const nb=document.querySelector('.notebook');nb.style.animation='none';void nb.offsetWidth;nb.style.animation='';briefPage(0)}
+function briefNext(){if(!briefState)return;const page=briefState.pages[briefIndex];if($('briefBody').textContent.length<page.body.length){$('briefBody').textContent=page.body;typeText();return}
+ if(briefIndex<briefState.pages.length-1){briefPage(briefIndex+1);return}closeBrief()}
+function closeBrief(){if(!briefState)return;clearInterval(briefTicker);const mode=briefState.mode;briefState=null;$('notebookScreen').classList.add('hidden');if(mode==='intro'){started=true;logEvent('Kommandolink online. Du bist am Zug.','good')}else if(mode==='outro'){initWorld();setTimeout(()=>showIntro(),150)}updateUI()}
+const introPages=[
+ {over:'BOOTSEQUENZ // SYSTEMKERN',title:'MILOPS / IX',body:'MILITÄRISCHES OPERATIONSNETZWERK\n\nVerbindung zur orbitalen Kommandozentrale hergestellt.\nSektor K-17 wird synchronisiert ...\n\nOperator, du übernimmst die Führung der Kampfgruppe NOVA auf einer strategisch kritischen Frontlinie.',urgent:'SICHERHEITSFREIGABE: KOMMANDOEBENE ALPHA',scene:'radar'},
+ {over:'AUFKLÄRUNG // K-17',title:'FRONTSEKTOR ECHO',body:'Feindliche Verbände kontrollieren den Nordostkorridor. Ein elektronisches Relais unterbricht unsere Verbindungen zur vorgeschobenen Operationszone.\n\nUnsere Kräfte stehen im Südwesten bereit: Panzer, Späher, Infanterie, Artillerie und Logistik.',urgent:'FEINDLAGE: PANZERKONTAKTE · STÖRSENDER AKTIV',scene:'convoy'},
+ {over:'OPERATIONSBEFEHL // 001',title:'OPERATION ECHO FRONT',body:'PRIMÄRZIEL:\nRelais ECHO im Zentrum erobern.\n\nHalte deine Verbände kampffähig und sichere nach Möglichkeit Produktionsstätten und Depots. Sobald das Relais online ist, werden weitere Befehle übermittelt.\n\nDie Initiative liegt bei dir, Operator.',urgent:'EINSATZ BEGINNT · RUNDE 01 · VIEL ERFOLG',scene:'mission'}
+];
+function showIntro(){showBrief(introPages,'intro')}
+function drawBriefScene(now){const w=briefCanvas.clientWidth,h=briefCanvas.clientHeight;if(!w||!h||!briefState)return;const t=(now-briefTime)/1000,scene=briefState.pages[briefIndex].scene;bc.clearRect(0,0,w,h);const grad=bc.createLinearGradient(0,0,w,h);grad.addColorStop(0,'#102b31');grad.addColorStop(.55,'#0a2229');grad.addColorStop(1,'#091820');bc.fillStyle=grad;bc.fillRect(0,0,w,h);
+ const unit=Math.min(w/11,h/8),cx=w*.49,cy=h*.48;
+ bc.strokeStyle='#79c9b822';bc.lineWidth=1;for(let x=0;x<=w;x+=unit*.65){bc.beginPath();bc.moveTo(x,0);bc.lineTo(x,h);bc.stroke()}for(let y=0;y<=h;y+=unit*.65){bc.beginPath();bc.moveTo(0,y);bc.lineTo(w,y);bc.stroke()}
+ bc.save();bc.translate(cx,cy);bc.strokeStyle='#72bcbf63';for(let r=1;r<=4;r++){bc.beginPath();bc.arc(0,0,r*unit*.95,0,Math.PI*2);bc.stroke()}bc.strokeStyle='#a4e6d8';bc.lineWidth=2;bc.beginPath();bc.arc(0,0,unit*4.1,t*.95,t*.95+.7);bc.stroke();bc.restore();
+ const nodes=[[-2.2,1.3,'blue'],[-1.2,.7,'blue'],[.7,-.5,'gold'],[2.4,-1.6,'red'],[1.8,1.8,'red'],[1.5,-2.3,'red']];
+ for(let i=0;i<nodes.length;i++){let [x,y,col]=nodes[i],c=col==='blue'?'#86cde8':col==='gold'?'#dfba73':'#e98c76';if(scene==='victory'&&col==='red')c='#94d7aa';const fade=.6+.4*Math.sin(t*2+i);bc.save();bc.translate(cx+x*unit,cy+y*unit);bc.strokeStyle=c;bc.fillStyle=c;bc.globalAlpha=fade;bc.lineWidth=2;bc.beginPath();bc.moveTo(0,-7);bc.lineTo(7,0);bc.lineTo(0,7);bc.lineTo(-7,0);bc.closePath();bc.stroke();if(col==='gold'){bc.fillStyle='#dfb97855';bc.fill()}bc.restore()}
+ bc.save();bc.translate(cx,cy);bc.strokeStyle=scene==='alarm'?'#df8666':'#73ceb7';bc.lineWidth=1.8;bc.setLineDash([6,6]);bc.beginPath();bc.moveTo(-2.2*unit,1.3*unit);bc.lineTo(-1.2*unit,.7*unit);bc.lineTo(.7*unit,-.5*unit);bc.lineTo(2.4*unit,-1.6*unit);bc.stroke();bc.restore();
+ if(scene==='alarm'){const a=(t*110)%w;bc.fillStyle='#ff614f19';bc.fillRect(0,h*.38,w,h*.19);bc.font='bold 17px monospace';bc.textAlign='center';bc.fillStyle=Math.sin(t*7)>0?'#ffad92':'#8f524d';bc.fillText('⚠ WARNING · MULTIPLE CONTACTS',cx,h*.87)}
+ else if(scene==='convoy'){bc.strokeStyle='#80c8ddaa';bc.lineWidth=3;bc.beginPath();bc.moveTo(w*.2,h*.72);bc.lineTo(w*.82,h*.34);bc.stroke();for(let i=0;i<3;i++){const f=((t*.12+i*.29)%.91)+.04;paintUnit(bc,{side:'player',type:i%2?'tank':'scout'},w*.2+(w*.62)*f,h*.72-(h*.38)*f,.55)}}
+ else if(scene==='mission'){bc.save();bc.strokeStyle='#f0c57f';bc.lineWidth=2.5;bc.translate(cx+.7*unit,cy-.5*unit);const r=unit*(.8+Math.sin(t*3)*.13);bc.beginPath();bc.arc(0,0,r,0,Math.PI*2);bc.stroke();bc.restore()}
+ else if(scene==='victory'){bc.font='bold 32px monospace';bc.textAlign='center';bc.fillStyle='#92debb';bc.fillText('✓',cx,h*.82)}
+ bc.font='9px monospace';bc.textAlign='left';bc.fillStyle='#7fb2af';bc.fillText('K-17 / GRID 019–442',14,h-14);bc.textAlign='right';bc.fillText(`TELEMETRY ${Math.floor(t*8).toString(16).toUpperCase().padStart(4,'0')}`,w-12,h-14);
+ // Tracing scan line.
+ bc.fillStyle='#7ce9d111';bc.fillRect(0,(t*27)%h,w,2);
+}
+function render(now){renderMap(now);if(briefState)drawBriefScene(now);
+ if(combatAnim){const c=combatAnim,t=Math.min(c.duration,now-c.started);drawFight(t);if(t>500&&!c.played){c.played=true;rattle();$('battleResult').textContent=`TREFFER −${c.dmg}`}
+ if(t>1300&&c.counter&&!c.retPlayed){c.retPlayed=true;sound(100,.13,'sawtooth',.04,-40)}
+ if(t>=c.duration){combatAnim=null;c.resolve()}}
+ requestAnimationFrame(render)
+}
+function posFromEvent(ev){const rect=map.getBoundingClientRect();return{x:ev.clientX-rect.left,y:ev.clientY-rect.top}}
+function zoomAt(factor,atX=boardW/2,atY=boardH/2){const next=Math.max(.35,Math.min(2.45,zoom*factor)),ratio=next/zoom;pan.x=atX-(atX-pan.x)*ratio;pan.y=atY-(atY-pan.y)*ratio;zoom=next}
+map.addEventListener('contextmenu',e=>e.preventDefault());
+map.addEventListener('pointerdown',e=>{if(e.button!==0&&e.button!==2)return;const {x,y}=posFromEvent(e);drag={x,y,px:x,py:y,moved:false,button:e.button};map.setPointerCapture(e.pointerId)});
+map.addEventListener('pointermove',e=>{const{x,y}=posFromEvent(e);mouse={x,y};if(drag){if(Math.hypot(x-drag.x,y-drag.y)>7)drag.moved=true;if(drag.moved){pan.x+=x-drag.px;pan.y+=y-drag.py}drag.px=x;drag.py=y;}const pos=screenToHex(x,y);hover=pos;$('coordRead').textContent=pos?`${String.fromCharCode(65+pos.q)} : ${String(pos.r+1).padStart(2,'0')}`:'-- : --';map.style.cursor=drag&&drag.moved?'grabbing':'crosshair'});
+map.addEventListener('pointerup',e=>{if(!drag)return;const d=drag;drag=null;map.style.cursor='crosshair';if(d.moved||d.button===2)return;const {x,y}=posFromEvent(e),pos=screenToHex(x,y);if(pos)handleMapClick(pos)});
+map.addEventListener('pointercancel',()=>{drag=null;map.style.cursor='crosshair'});
+map.addEventListener('pointerleave',()=>{hover=null;});
+map.addEventListener('wheel',e=>{e.preventDefault();const{x,y}=posFromEvent(e);zoomAt(e.deltaY<0?1.12:1/1.12,x,y)},{passive:false});
+$('zoomIn').onclick=()=>zoomAt(1.2);$('zoomOut').onclick=()=>zoomAt(1/1.2);$('zoomFit').onclick=fitMap;
+$('nextBriefBtn').onclick=briefNext;$('skipBriefBtn').onclick=()=>{if(briefState)closeBrief()};
+$('endTurnBtn').onclick=endTurn;$('briefBtn').onclick=()=>{if(!started||busy||briefState)return;showBrief([introPages[2]],'review')};
+$('soundBtn').onclick=()=>{soundOn=!soundOn;$('soundBtn').textContent=soundOn?'♫ TON AN':'♫ TON AUS';if(soundOn)blip(750,.08)};
+$('helpBtn').onclick=()=>{$('helpOverlay').classList.add('show')};$('closeHelpBtn').onclick=()=>{$('helpOverlay').classList.remove('show')};
+$('helpOverlay').onclick=e=>{if(e.target===$('helpOverlay'))$('helpOverlay').classList.remove('show')};
+$('battleOverlay').onclick=()=>{if(combatAnim)combatAnim.started=performance.now()-combatAnim.duration};
+window.addEventListener('keydown',e=>{if(e.key==='Escape'){$('helpOverlay').classList.remove('show');if(briefState&&briefState.mode!=='outro')closeBrief()}
+ if(e.key==='h'||e.key==='H'){$('helpOverlay').classList.toggle('show')}
+ if(e.key==='m'||e.key==='M'){$('soundBtn').click()}
+ if(e.code==='Space'){e.preventDefault();if(!briefState&&!$('helpOverlay').classList.contains('show'))endTurn()}
+ if(e.key==='Enter'&&briefState){e.preventDefault();briefNext()}
+ if(e.key==='+'||e.key==='=')zoomAt(1.15);if(e.key==='-')zoomAt(1/1.15);
+});
+window.addEventListener('resize',fitCanvases);
+initWorld();fitCanvases();showIntro();requestAnimationFrame(render);
+})();
+</script>
+</body>
+</html>

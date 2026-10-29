@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Dice Poker – Retro Würfelpoker</title>
+  <style>
+    :root {
+      --ink: #f7eed7; --muted: #bdb49c; --gold: #f0ca7b; --gold-dark: #ad8347;
+      --navy: #111520; --panel: #1d2230; --panel-hi: #262c3a;
+      --felt: #123a39; --felt-mid: #18514d; --felt-deep: #082b2c;
+      --good: #8df0bc; --bad: #fa9b9f; --line: rgba(238,220,169,.18);
+    }
+    * { box-sizing:border-box }
+    html { min-height:100%; background:#0d1019 }
+    body { margin:0; min-height:100vh; color:var(--ink); background:radial-gradient(ellipse at 50% -35%,#33303e 0%,#151925 45%,#0b0e16 100%); font-family:Trebuchet MS,Segoe UI,Arial,sans-serif; }
+    button,select { font:inherit }
+    button { cursor:pointer }
+    button:disabled { cursor:not-allowed; opacity:.43; filter:grayscale(.4) }
+    button:focus-visible,select:focus-visible { outline:3px solid #e6b75c;outline-offset:3px }
+    .shell { max-width:1190px; margin:auto; padding:24px 18px 32px }
+    .top {display:flex;gap:16px;align-items:center;justify-content:space-between;padding:5px 1px 20px; flex-wrap:wrap}
+    .brand { display:flex;align-items:center;gap:13px;min-width:0 }
+    .brandmark {width:52px;height:52px;border:2px solid var(--gold-dark);border-radius:12px;display:grid;place-items:center;color:var(--gold);background:#1e2230;box-shadow:inset 0 0 0 3px #111520;font-size:32px;transform:rotate(-4deg)}
+    .eyebrow {color:var(--gold);text-transform:uppercase;letter-spacing:.22em;font-size:10px;font-weight:800}
+    h1 {font-family:Georgia,Times New Roman,serif;font-size:clamp(27px,4.5vw,39px);line-height:1;margin:5px 0 0;letter-spacing:-.02em;font-weight:900;text-transform:uppercase}
+    h1 span {color:var(--gold)}
+    .topright {display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .tiny-stat {font-size:12px;color:var(--muted);letter-spacing:.02em;white-space:nowrap}
+    .tiny-stat b {color:var(--ink)}
+    .ghost {border:1px solid var(--line);border-radius:9px;background:rgba(255,255,255,.035);color:var(--ink);padding:10px 13px;font-size:12px;font-weight:800;transition:background .15s}
+    .ghost:hover:not(:disabled){background:rgba(255,255,255,.09)}
+    .scoreboard {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:15px}
+    .seat {position:relative;min-width:0;min-height:110px;padding:14px 13px 13px;background:linear-gradient(130deg,#262b39,#1b202d);border:1px solid var(--line);border-radius:13px;overflow:hidden;transition:border-color .15s}
+    .seat.you {background:linear-gradient(135deg,#323039,#272535);border-color:rgba(240,202,123,.5)}
+    .seat.current {box-shadow:inset 0 0 0 1px rgba(240,202,123,.85)}
+    .seat.out {opacity:.48;filter:grayscale(1)}
+    .seat.empty {border-style:dashed;opacity:.27;background:transparent}
+    .seat-header {display:flex;gap:8px;align-items:center;justify-content:space-between;min-width:0}
+    .seat-name {font-size:14px;font-weight:900;letter-spacing:.06em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .badge {font-size:9px;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--line);padding:3px 5px;border-radius:5px;color:var(--muted);white-space:nowrap}
+    .badge.human {color:var(--gold);border-color:rgba(240,202,123,.4)}
+    .bankroll {display:flex;align-items:center;gap:9px;margin-top:17px;font-size:27px;font-weight:900;line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+    .coin {width:23px;height:23px;display:inline-block;flex-shrink:0;border-radius:50%;border:3px dashed rgba(255,246,199,.8);background:radial-gradient(circle at 35% 30%,#fbe8ae,#d5a34d 75%,#926532);box-shadow:0 0 0 2px #926532,inset 0 0 0 1px #fbe8ae}
+    .seat-foot {height:15px;margin-top:7px;color:var(--muted);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .seat-foot .good {color:var(--good)} .seat-foot .bad {color:var(--bad)}
+    .layout {display:grid;grid-template-columns:minmax(0,1fr) 305px;gap:15px;align-items:stretch}
+    .table-wrap {min-width:0;display:flex;flex-direction:column;gap:12px}
+    .felt {isolation:isolate;position:relative;min-height:418px;border:7px solid #694729;border-radius:24px;background:radial-gradient(ellipse at 50% 40%,#1b5852 0%,#123e3b 59%,#0b3232 100%);box-shadow:0 0 0 2px #322617,0 12px 0 #2f241e,0 19px 27px rgba(0,0,0,.32),inset 0 0 0 2px #a7733e,inset 0 0 55px #081f24;padding:26px 23px 24px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between}
+    .felt:before {content:"";position:absolute;inset:22px;border:1px solid rgba(249,226,163,.23);border-radius:50%;pointer-events:none;z-index:-1}
+    .felt:after {content:"";position:absolute;inset:0;opacity:.1;z-index:-1;pointer-events:none;background-image:repeating-linear-gradient(45deg,transparent 0px,transparent 4px,rgba(255,255,255,.08) 5px,transparent 7px)}
+    .table-top {display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+    .ribbon {color:rgba(255,235,181,.7);font-family:Georgia,serif;font-size:12px;text-transform:uppercase;letter-spacing:.18em}
+    .pot {text-align:right;min-width:86px}
+    .pot-label {font-size:10px;letter-spacing:.16em;color:#d6caaa;font-weight:800}
+    .pot-val {display:flex;gap:8px;align-items:center;justify-content:flex-end;font-size:28px;font-weight:900;color:#ffde92;margin-top:4px;font-variant-numeric:tabular-nums}
+    .pot-val .coin {width:17px;height:17px;border-width:2px;box-shadow:0 0 0 1px #926532}
+    .felt-centre {text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;min-height:240px}
+    .turn-label {font-size:13px;letter-spacing:.2em;color:#ebd6a3;text-transform:uppercase;font-weight:900}
+    .hand-name {font-family:Georgia,serif;font-size:clamp(19px,3.8vw,29px);font-weight:bold;color:#fff9e9;min-height:34px;text-shadow:0 2px 3px #061d1e}
+    .dice {display:flex;gap:clamp(6px,1.6vw,15px);align-items:center;justify-content:center;flex-wrap:nowrap;width:100%}
+    /* Richtige 3D-Wuerfel: sechs bedruckte Flaechen, perspektivische Drehung,
+       Fallbewegung, Nachhuepfen und ein unabhaengiger Bodenschatten. */
+    .die {--size:clamp(42px,8.7vw,79px);width:var(--size);height:var(--size);position:relative;flex:0 1 var(--size);min-width:0;display:block;border:0;padding:0;background:transparent;overflow:visible;user-select:none;-webkit-tap-highlight-color:transparent;isolation:isolate}
+    .die:disabled {opacity:1;filter:none;cursor:default}
+    .die.rolling {z-index:3;pointer-events:none}
+    .die-scene {position:absolute;inset:0;perspective:650px;perspective-origin:50% 55%;pointer-events:none}
+    .die-stage {position:absolute;inset:0;transform-style:preserve-3d;will-change:transform}
+    .die-body {position:absolute;inset:0;transform-style:preserve-3d;will-change:transform}
+    .die-face {position:absolute;inset:0;border:2px solid #d6cbbb;border-radius:14%;background:linear-gradient(140deg,#fffef7 3%,#f4f0e6 51%,#ded7ca 100%);box-shadow:inset 2px 2px 2px rgba(255,255,255,.95),inset -3px -4px 5px rgba(90,77,59,.18),0 0 2px rgba(0,0,0,.2);backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;display:grid;place-items:center;padding:11%;}
+    .die-face::before {content:"";position:absolute;inset:5%;border:1px solid rgba(185,168,146,.17);border-radius:12%;pointer-events:none}
+    .die-face[data-side="1"]{transform:rotateY(0deg) translateZ(calc(var(--size) / 2))}
+    .die-face[data-side="2"]{transform:rotateX(90deg) translateZ(calc(var(--size) / 2))}
+    .die-face[data-side="3"]{transform:rotateY(90deg) translateZ(calc(var(--size) / 2))}
+    .die-face[data-side="4"]{transform:rotateY(-90deg) translateZ(calc(var(--size) / 2))}
+    .die-face[data-side="5"]{transform:rotateX(-90deg) translateZ(calc(var(--size) / 2))}
+    .die-face[data-side="6"]{transform:rotateY(180deg) translateZ(calc(var(--size) / 2))}
+    .die-shadow {position:absolute;left:10%;bottom:-14%;width:80%;height:21%;border-radius:50%;background:rgba(0,0,0,.6);filter:blur(5px);opacity:.8;pointer-events:none}
+    .die.held::after {content:"";position:absolute;inset:-6px;border:3px solid #f4cc7b;border-radius:14px;box-shadow:0 0 0 2px rgba(75,47,21,.65),0 0 15px rgba(237,195,92,.4);pointer-events:none}
+    .die.held .die-stage {transform:translateY(-5px)}
+    @media(hover:hover) and (pointer:fine){.die:not(.rolling):not(:disabled):hover .die-stage{transform:translateY(-4px)}.die.held:not(.rolling):not(:disabled):hover .die-stage{transform:translateY(-8px)}}
+    .die-grid {width:100%;height:100%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:1px}
+    .pip {width:min(100%,15px);aspect-ratio:1;align-self:center;justify-self:center;border-radius:100%;background:radial-gradient(circle at 35% 35%,#595350,#22252b 70%);box-shadow:inset 1px 1px 1px rgba(0,0,0,.35)}
+    .die.held .pip {background:radial-gradient(circle at 35% 35%,#b9924c,#654927 75%)}
+    /* Traditionelle Pokerwuerfel: 9, 10, Bube, Dame, Koenig, Ass. */
+    .poker-art {width:100%;height:100%;display:block;overflow:visible}
+    .poker-art .rank {font-family:Georgia,'Times New Roman',serif;font-weight:900;fill:#242732;paint-order:stroke;stroke:rgba(255,255,255,.15);stroke-width:1}
+    .poker-art .red {fill:#ae3536}.poker-art .black {fill:#293344}
+    .poker-art .line {fill:none;stroke:#b9a584;stroke-width:1.3}
+    .poker-art .ornament {fill:#bf9c58}
+    .die-face.poker {padding:4%}
+    .mini-poker-face {display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;background:linear-gradient(145deg,#f8f4eb,#ddd3c4);border-radius:5px;border:1px solid #b8ac98;margin-left:2px;font-family:Georgia,serif;font-size:11px;font-weight:900;color:#253143;box-shadow:0 2px 1px #747068}
+    .mini-poker-face.red {color:#af3536}
+    .mini-poker-face .mini-suit {font-size:9px;margin-left:1px}
+    .dice-caption {text-align:center;font-size:10px;letter-spacing:.09em;color:#d8ceb1;min-height:13px}
+    .hold-under {display:flex;justify-content:center;gap:clamp(6px,1.6vw,15px);width:100%;min-height:19px}
+    .hold-under span {width:clamp(42px,8.7vw,79px);flex:0 1 clamp(42px,8.7vw,79px);text-align:center;font-size:10px;letter-spacing:.03em;color:#ffda8c;font-weight:900}
+    .table-bottom {display:flex;justify-content:space-between;align-items:flex-end;gap:12px;min-height:38px}
+    .felt-note {font-size:12px;line-height:1.45;color:#c1d7c8;max-width:375px;min-width:0}
+    .roll-tokens {display:flex;align-items:center;gap:6px;white-space:nowrap;color:#d6e0c8;font-size:11px}
+    .roll-dot {width:9px;height:9px;border-radius:50%;border:1px solid #e4c989;background:rgba(0,0,0,.3)}
+    .roll-dot.available {background:#e9c77e;box-shadow:0 0 8px rgba(255,212,111,.35)}
+    .controls {border:1px solid var(--line);border-radius:13px;padding:15px 16px;background:linear-gradient(135deg,#252b38,#1a202c);display:flex;gap:14px;align-items:center;justify-content:space-between;min-height:95px;flex-wrap:wrap}
+    .ctrl-text {min-width:150px;flex:1 1 190px}
+    .ctrl-text strong {display:block;font-size:15px;line-height:1.3}
+    .ctrl-text small {display:block;margin-top:5px;line-height:1.35;color:var(--muted);font-size:12px}
+    .actions {display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;max-width:100%}
+    .btn {font-weight:900;font-size:13px;white-space:nowrap;letter-spacing:.01em;min-height:43px;border-radius:9px;padding:11px 15px;border:1px solid var(--line);background:#333a4b;color:#f6f0e2;transition:filter .14s,transform .14s}
+    .btn:hover:not(:disabled) {filter:brightness(1.13)}
+    .btn:active:not(:disabled){transform:translateY(1px)}
+    .btn.primary {background:linear-gradient(#f5d591,#d8a75c);border-color:#f3d998;color:#38261e;box-shadow:inset 0 1px 0 rgba(255,255,255,.55)}
+    .btn.soft {background:#1d4a48;border-color:#37766b;color:#e3fff0}
+    .btn.danger {background:#3b2932;border-color:#74505a;color:#ffd5d8}
+    .side {min-width:0;display:flex;flex-direction:column;gap:13px}
+    .sidebar-card {min-width:0;border:1px solid var(--line);background:linear-gradient(150deg,#232937,#1b202d);border-radius:12px;padding:17px 17px 15px}
+    .panel-title {text-transform:uppercase;font-size:11px;font-weight:900;letter-spacing:.17em;color:var(--gold);margin:0 0 14px;display:flex;align-items:center;justify-content:space-between;gap:6px}
+    .panel-title button {font-size:11px;color:var(--muted);background:none;border:0;text-decoration:underline;cursor:pointer;padding:4px}
+    .hand-list {list-style:none;margin:0;padding:0;display:grid;gap:8px}
+    .hand-list li {display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;padding-bottom:7px;border-bottom:1px solid rgba(241,216,162,.09)}
+    .hand-list li:last-child {border:0;padding-bottom:0}
+    .hand-list li span {color:#c1bfd0;white-space:nowrap}
+    .hand-list li b {font-weight:800;text-align:right}
+    .hand-list li.highlight b {color:var(--gold)}
+    .hand-list li.highlight span {color:#f1e1bf}
+    .sidebar-card.logcard {flex:1;min-height:150px}
+    .events {list-style:none;margin:0;padding:0;display:grid;gap:12px}
+    .events li {padding-left:12px;border-left:2px solid rgba(232,190,118,.35);font-size:12px;line-height:1.4;color:#d4d2cf}
+    .events li:first-child {border-color:var(--gold);color:#f8ecd5}
+    .events small {display:block;color:#9a9eac;font-size:10px;margin-bottom:1px;letter-spacing:.04em}
+    .showdown {padding:10px 0 0}
+    .showdown-row {display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:12px}
+    .showdown-row:last-child{border-bottom:none}
+    .showdown-row .sub {font-size:11px;color:var(--muted);margin-top:4px}
+    .showdown-row .mini-dice {font-size:19px;letter-spacing:1px;color:#f8e4ad;white-space:nowrap}
+    .showdown-row .won {color:var(--good);font-weight:900;text-align:right}
+    .showdown-row .lost {color:var(--muted);font-weight:900;text-align:right}
+    .result-banner {margin-top:13px;padding:10px 12px;border:1px solid rgba(141,240,188,.3);background:rgba(35,112,79,.14);color:#bcf3cd;border-radius:8px;font-weight:800;font-size:12px;line-height:1.5}
+    .result-banner.negative {background:rgba(125,40,46,.15);border-color:rgba(250,155,159,.3);color:#ffbdb8}
+    .howto {margin:19px 1px 0;color:#989aa3;font-size:11px;line-height:1.5;text-align:center}
+    .veil {position:fixed;inset:0;z-index:30;background:rgba(6,9,17,.85);display:grid;place-items:center;padding:20px;backdrop-filter:blur(7px);overflow:auto}
+    .veil[hidden] {display:none}
+    .modal {width:min(100%,505px);border:1px solid rgba(245,210,133,.6);background:linear-gradient(145deg,#2b2c3b,#161d29);box-shadow:0 20px 90px rgba(0,0,0,.65),inset 0 0 0 4px #1b202d;border-radius:18px;text-align:center;padding:32px 27px 26px}
+    .modal .mark {font-size:50px;line-height:1;display:block;margin-bottom:12px}
+    .modal h2 {font-family:Georgia,serif;font-size:37px;line-height:1;margin:5px 0 12px;color:#f7dc9e}
+    .modal p {color:#cdc9c6;line-height:1.6;font-size:14px;margin:0 auto 20px;max-width:365px}
+    .modal label {display:block;color:#e7d9b7;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:900;margin-bottom:9px}
+    .modal select {display:block;max-width:340px;width:100%;padding:13px 15px;margin:0 auto 18px;font-size:16px;border:1px solid rgba(242,204,132,.5);border-radius:10px;color:#fff1cf;background:#242a39}
+    .modal .btn {font-size:15px;min-width:170px}
+    .sound-toggle {white-space:nowrap;min-width:86px}
+    .sound-toggle[aria-pressed="false"] {color:var(--muted)}
+    .dice-type-control {display:flex;gap:8px;align-items:center;color:var(--muted);font-weight:800;font-size:10px;letter-spacing:.1em}
+    .dice-type-control select {font-size:12px;color:#ffebc1;border:1px solid var(--line);background:#242a39;border-radius:7px;padding:8px 7px;max-width:145px;cursor:pointer}
+    .dice-type-control select:disabled {opacity:.5}
+    .lobby-dice-preview {display:flex;justify-content:center;align-items:center;gap:8px;margin:-8px 0 20px;min-height:38px}
+    .preview-die {width:35px;height:35px;border:2px solid #ded5c5;border-radius:7px;background:linear-gradient(140deg,#fffef7,#e2d9c7);display:grid;place-items:center;padding:4px}
+    .preview-die .poker-art {width:100%;height:100%}
+    .modal-foot {display:block;font-size:11px;color:#8f91a0;margin-top:19px;line-height:1.5}
+    .rules {display:none;text-align:left;margin:10px 0 18px;padding:16px;border:1px solid var(--line);border-radius:10px;font-size:12px;line-height:1.6;color:#eee1c7;background:#171d28}
+    .rules.open {display:block}
+    .rules b {color:var(--gold)}
+    .rules p {font-size:12px;text-align:left;margin:0 0 10px}
+    .rules p:last-child {margin:0}
+    .toast {display:none;color:#ffdb9d;text-align:center;font-size:12px;padding:4px 0}
+    .toast.visible {display:block}
+    @media(max-width:880px){.layout{grid-template-columns:minmax(0,1fr)}.side{display:grid;grid-template-columns:1fr 1fr}.sidebar-card.logcard{min-height:0}.felt{min-height:395px}}
+    @media(max-width:560px){.shell{padding:15px 10px 24px}.scoreboard{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.seat{min-height:92px;padding:10px}.bankroll{margin-top:10px;font-size:23px}.seat-foot{margin-top:5px}.top{padding-bottom:15px}.brandmark{width:43px;height:43px;font-size:27px}.topright{gap:8px}.felt{padding:19px 10px 17px;min-height:342px;border-width:6px;border-radius:20px}.felt:before{inset:10px}.felt-centre{min-height:213px;gap:11px}.die-face{border-width:1.5px}.die.held::after{inset:-4px;border-width:2px}.side{grid-template-columns:1fr}.controls{padding:13px 12px;gap:11px}.actions{justify-content:flex-start;width:100%}.btn{padding:11px 12px;font-size:12px}.ribbon{letter-spacing:.06em;font-size:11px}.pot-val{font-size:24px}.table-bottom{align-items:center}.felt-note{font-size:11px}.modal{padding:28px 17px}.modal h2{font-size:31px}}
+    @media(max-width:350px){.topright{width:100%;justify-content:space-between}.die-face{padding:9%}.actions .btn{flex-grow:1}.turn-label{font-size:11px;letter-spacing:.11em}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after {animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+  <div class="shell" id="game">
+    <header class="top">
+      <div class="brand"><div class="brandmark" aria-hidden="true">⚄</div><div><div class="eyebrow">★ Das Retro-Casino ★</div><h1>Dice <span>Poker</span></h1></div></div>
+      <div class="topright"><label class="dice-type-control" for="dice-mode"><span>WÜRFEL</span><select id="dice-mode" aria-label="Würfelart"><option value="normal">⚄ Klassisch</option><option value="poker">♠ Poker</option></select></label><button type="button" class="ghost sound-toggle" id="sound-toggle" aria-label="Würfelgeräusch ausschalten" aria-pressed="true" title="Würfelgeräusch ausschalten">🔊 Ton an</button><span class="tiny-stat" id="round-indicator">Runde <b>–</b></span><button type="button" class="ghost" id="rules-button">? Regeln</button><button type="button" class="ghost" id="restart-button">↻ Neues Spiel</button></div>
+    </header>
+    <section class="scoreboard" id="scoreboard" aria-label="Jetonstände"></section>
+    <main class="layout">
+      <div class="table-wrap">
+        <section class="felt" aria-label="Würfeltisch">
+          <div class="table-top"><div class="ribbon">♦ Würfeltisch · High Stakes ♦</div><div class="pot"><div class="pot-label">IM POT</div><div class="pot-val"><span class="coin" aria-hidden="true"></span><span id="pot-value">0</span></div></div></div>
+          <div class="felt-centre">
+            <div class="turn-label" id="turn-label">DEIN BLATT</div>
+            <div class="hand-name" id="hand-name" aria-live="polite">Bereit für die erste Runde?</div>
+            <div class="dice" id="dice" aria-label="Fünf Würfel"></div>
+            <div class="hold-under" id="hold-indicators" aria-hidden="true"></div><div class="dice-caption" id="dice-caption">Normale Augenwürfel · 1–6</div>
+          </div>
+          <div class="table-bottom"><div class="felt-note" id="felt-note">Drei Würfe insgesamt. Wähle aus, welche Würfel du behalten möchtest.</div><div class="roll-tokens" id="roll-tokens" aria-label="Verbleibende Nachwürfe"></div></div>
+        </section>
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+        <section class="controls" aria-label="Spielsteuerung">
+          <div class="ctrl-text"><strong id="action-title">Willkommen am Tisch!</strong><small id="action-help">Starte ein Spiel gegen ein bis drei Computergegner.</small></div>
+          <div class="actions" id="actions"></div>
+        </section>
+      </div>
+      <aside class="side">
+        <section class="sidebar-card" id="details-panel"><h2 class="panel-title" id="details-title">Pokerhände <span>↓ stärker</span></h2><div id="details-content"></div></section>
+        <section class="sidebar-card logcard"><h2 class="panel-title">Am Tisch</h2><ul class="events" id="events" aria-live="polite"></ul></section>
+      </aside>
+    </main>
+    <div class="howto">5 Würfel · 2 freiwillige Nachwürfe · 5 Jetons Grundeinsatz · Kein Echtgeld, keine Anmeldung, kein Internet erforderlich</div>
+  </div>
+  <div class="veil" id="overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <span class="mark" aria-hidden="true">🎲</span>
+      <div class="eyebrow" id="modal-kicker">Willkommen im Casino</div>
+      <h2 id="modal-title">Würfelpoker</h2>
+      <p id="modal-description">Spiele mit fünf Würfeln gegen Computergegner. Setze Jetons, verbessere dein Blatt und bringe alle Mitspieler zur Strecke.</p>
+      <label for="opponents">Anzahl der Gegner</label>
+      <select id="opponents"><option value="1">1 Gegner · Duell</option><option value="2" selected>2 Gegner · Trio</option><option value="3">3 Gegner · Vierertisch</option></select>
+      <label for="lobby-dice-mode">Würfelart</label>
+      <select id="lobby-dice-mode"><option value="normal">⚄ Klassische Augenwürfel (1–6)</option><option value="poker">♠ Pokerwürfel (9, 10, B, D, K, A)</option></select>
+      <div class="lobby-dice-preview" id="lobby-dice-preview" aria-label="Würfelvorschau"></div>
+      <button type="button" class="btn primary" id="start-button">Partie starten →</button>
+      <div class="modal-foot">Alle starten mit 100 Jetons. Wer 0 hat, scheidet aus.<br>Gespielt wird bis zu deinem Sieg oder deiner Niederlage.</div>
+    </div>
+  </div>
+  <script>
+  (() => {
+    'use strict';
+    const root = document.getElementById('game');
+    if (root.dataset.ready) return;
+    root.dataset.ready = '1';
+    const $ = (id) => document.getElementById(id);
+    const names = ['DU', 'BYTE', 'NOVA', 'VEX'];
+    const unicodeDice = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+    const pokerRanks = ['','9','10','B','D','K','A'];
+    const pokerNames = ['','Neun','Zehn','Bube','Dame','König','Ass'];
+    const pokerSuits = ['','♠','♦','♣','♥','♠','♥'];
+    const diceRotation = [null,[0,0],[-90,0],[0,-90],[0,90],[90,0],[0,180]];
+    const patterns = [[],[4],[0,8],[0,4,8],[0,2,6,8],[0,2,4,6,8],[0,2,3,5,6,8]];
+    const ranking = ['','Höchste Würfel','Ein Paar','Zwei Paare','Drilling','Straße','Full House','Vierling','Fünfling'];
+    const categoryLabel = ['','Höchster Würfel','Paar','Zwei Paare','Drilling','Straße','Full House','Vierling','Fünfling'];
+    const S = {epoch:0,players:[],round:0,phase:'lobby',hand:[1,1,1,1,1],held:[false,false,false,false,false],left:2,rolling:false,rollingIndices:[],betCursor:-1,currentBet:0,raises:0,history:[],notes:[],lastPayout:[],endState:null,diceMode:'normal'};
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let toastTimer = null;
+    let audioContext = null;
+    let rollingSound = null;
+    const holdSounds = new Set();
+    let audioEnabled = true;
+
+    // Kein Download, keine externen Audiodateien: echte kleine Kollisionen werden
+    // mit Rauschimpulsen und resonierenden Würfelkörpern im Web Audio API gemischt.
+    // Alle Würfe nutzen den gleichen AudioContext (kein Speicher-/Context-Leak).
+    function prepareAudio(){
+      if(!audioEnabled)return null;
+      try{
+        if(!audioContext){
+          const Context=window.AudioContext||window.webkitAudioContext;
+          if(!Context)return null;
+          audioContext=new Context();
+        }
+        if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});
+        return audioContext;
+      }catch(error){return null;}
+    }
+    function stopDiceSound(){
+      if(!rollingSound)return;
+      try{rollingSound.stop();}catch(error){}
+      rollingSound=null;
+    }
+    // Kurzes mechanisches Einrasten beim Fixieren, weicheres Ausklicken
+    // beim Freigeben. Genau wie die Rollgeraeusche komplett offline generiert.
+    function stopHoldSounds(){
+      for(const source of holdSounds){
+        try{source.stop();}catch(error){}
+      }
+      holdSounds.clear();
+    }
+    function playHoldSound(locked){
+      const ctx=prepareAudio();
+      if(!ctx||!audioEnabled)return;
+      try{
+        const rate=ctx.sampleRate;
+        const duration=locked?.13:.095;
+        const buffer=ctx.createBuffer(1,Math.ceil(rate*duration),rate);
+        const samples=buffer.getChannelData(0);
+        const tau=Math.PI*2;
+        // Beim Festhalten ein solides "Klack-Schnapp", beim Loesen ein leiseres "Tick".
+        function impact(at,strength,lowPitch){
+          const start=Math.floor(at*rate);
+          const span=Math.min(Math.floor(rate*.075),samples.length-start);
+          let filtered=0;
+          for(let n=0;n<span;n++){
+            const t=n/rate;
+            const white=Math.random()*2-1;
+            filtered=filtered*.68+white*.32;
+            const click=(white-filtered)*Math.exp(-t*230);
+            const body=Math.sin(t*tau*lowPitch)*Math.exp(-t*85);
+            const snap=Math.sin(t*tau*(lowPitch*3.7))*Math.exp(-t*155);
+            samples[start+n]+=strength*(click*.48+body*.43+snap*.22);
+          }
+        }
+        if(locked){
+          impact(0,.95,440+Math.random()*50);
+          impact(.029,.62,700+Math.random()*80); // Riegel greift hoerbar ein
+        }else{
+          impact(0,.54,650+Math.random()*60);
+          impact(.021,.17,390); // kurzer, gedämpfter Ruecklauf
+        }
+        const source=ctx.createBufferSource();
+        const gain=ctx.createGain();
+        source.buffer=buffer;
+        gain.gain.value=.62;
+        source.connect(gain);
+        gain.connect(ctx.destination);
+        holdSounds.add(source);
+        source.onended=()=>{
+          holdSounds.delete(source);
+          source.disconnect();
+          gain.disconnect();
+        };
+        source.start();
+      }catch(error){/* Kein Ton darf das Wuerfeln beeintraechtigen. */}
+    }
+    function playDiceSound(count,duration){
+      stopDiceSound();
+      const ctx=prepareAudio();
+      if(!ctx||!audioEnabled||!count)return;
+      try{
+        const rate=ctx.sampleRate;
+        const length=Math.ceil(rate*(duration+.16));
+        const buffer=ctx.createBuffer(1,length,rate);
+        const pcm=buffer.getChannelData(0);
+        const tau=Math.PI*2;
+
+        // Kurzer, hohler Aufprall des Würfelkörpers und eine knackige Kante;
+        // jede Berührung mit dem Filz hat eigene Lautstärke und Tonhöhe.
+        function tap(at,strength){
+          if(at<0||at>duration+.02)return;
+          const start=Math.floor(at*rate);
+          const pitch=700+Math.random()*1150;
+          const body=190+Math.random()*160;
+          const span=Math.min(Math.round(rate*.075),length-start);
+          let low=0;
+          for(let n=0;n<span;n++){
+            const t=n/rate;
+            const noise=Math.random()*2-1;
+            low=low*.76+noise*.24;
+            const bright=(noise-low)*Math.exp(-t*145);
+            const hollow=Math.sin(t*tau*body)*Math.exp(-t*73);
+            const edge=Math.sin(t*tau*pitch)*Math.exp(-t*102);
+            pcm[start+n]+=strength*(bright*.25+hollow*.39+edge*.30);
+          }
+        }
+
+        // Kleine unregelmäßige Klicks beim ersten Schütteln, dann deutlich
+        // hörbare Landungen im Takt der 3D-Hüpfer (.39, .67 und .91).
+        const hits=[
+          [.015,.25],[.09,.19],[.18,.25],[.28,.20],
+          [.39,1],[.51,.48],[.67,.72],[.78,.30],[.91,.49],
+          [1,.15]
+        ];
+        const scale=Math.sqrt(Math.min(5,count)/5);
+        for(let die=0;die<count;die++){
+          for(const [fraction,base] of hits){
+            const jitter=(Math.random()-.5)*(fraction<.35?.050:.065);
+            const at=Math.max(0,duration*fraction+jitter);
+            const energy=(.55+Math.random()*.55)*base;
+            tap(at,energy*scale);
+            // Winziger Nachklapperer wenn eine Kante die Tischfläche trifft.
+            if(base>.45&&Math.random()<.62)tap(at+.012+Math.random()*.022,energy*.21*scale);
+          }
+        }
+        // Minimale Raumreflexion: weniger steril, ohne hörbaren Echoeffekt.
+        const delay=Math.round(rate*.027);
+        for(let i=delay;i<length;i++)pcm[i]+=pcm[i-delay]*.11;
+        // Sanfter Spitzenwertbegrenzer, damit fünf Würfel nicht übersteuern.
+        let peak=0;
+        for(let i=0;i<length;i++)peak=Math.max(peak,Math.abs(pcm[i]));
+        const gain=peak?Math.min(.64/peak,.85):0;
+        for(let i=0;i<length;i++)pcm[i]=Math.tanh(pcm[i]*gain);
+
+        const source=ctx.createBufferSource();
+        const output=ctx.createGain();
+        source.buffer=buffer;
+        output.gain.value=.74;
+        source.connect(output);output.connect(ctx.destination);
+        rollingSound=source;
+        source.onended=()=>{if(rollingSound===source)rollingSound=null;source.disconnect();output.disconnect();};
+        source.start();
+      }catch(error){/* Bei fehlender Audiounterstützung bleibt das Spiel spielbar. */}
+    }
+    function updateSoundButton(){
+      const b=$('sound-toggle');
+      b.textContent=audioEnabled?'🔊 Ton an':'🔇 Ton aus';
+      b.setAttribute('aria-pressed',String(audioEnabled));
+      const text=audioEnabled?'Würfelgeräusch ausschalten':'Würfelgeräusch einschalten';
+      b.setAttribute('aria-label',text);b.title=text;
+    }
+
+    function randomInt(n) {
+      if (window.crypto && typeof crypto.getRandomValues==='function') {
+        const bytes = new Uint32Array(1);
+        const limit = Math.floor(4294967296/n)*n;
+        let r;
+        do { crypto.getRandomValues(bytes); r=bytes[0]; } while(r>=limit);
+        return r%n;
+      }
+      return Math.floor(Math.random()*n);
+    }
+    function d6() { return randomInt(6)+1; }
+    function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+    function cash(p) { return p.chips; }
+    function activePlayers() { return S.players.filter(p=>p.inRound); }
+    function contestants() { return activePlayers().filter(p=>!p.folded); }
+    function potTotal() { return S.players.reduce((sum,p)=>sum+p.contributed,0); }
+    function log(message) { S.history.unshift({round:S.round,message}); S.history.length=Math.min(S.history.length,7); }
+    function toast(message) {
+      const box=$('toast'); box.textContent=message; box.classList.add('visible');
+      clearTimeout(toastTimer); toastTimer=setTimeout(()=>box.classList.remove('visible'),2300);
+    }
+    function handRank(dice) {
+      const counts=[0,0,0,0,0,0,0];
+      for(const d of dice) counts[d]++;
+      const groups=Array.from({length:6},(_,i)=>({face:i+1,n:counts[i+1]})).filter(g=>g.n).sort((a,b)=>b.n-a.n||b.face-a.face);
+      const sorted=dice.slice().sort((a,b)=>b-a);
+      const seq=Array.from(new Set(dice)).sort((a,b)=>a-b);
+      const straight=seq.length===5 && (seq.join('')==='12345'||seq.join('')==='23456');
+      let cat,tie;
+      if(groups[0].n===5){cat=8;tie=[groups[0].face];}
+      else if(groups[0].n===4){cat=7;tie=[groups[0].face,groups[1].face];}
+      else if(groups[0].n===3&&groups[1].n===2){cat=6;tie=[groups[0].face,groups[1].face];}
+      else if(straight){cat=5;tie=[Math.max(...seq)];}
+      else if(groups[0].n===3){cat=4;tie=[groups[0].face,...groups.slice(1).map(g=>g.face).sort((a,b)=>b-a)];}
+      else if(groups[0].n===2&&groups[1].n===2){cat=3;tie=[...groups.slice(0,2).map(g=>g.face).sort((a,b)=>b-a),groups[2].face];}
+      else if(groups[0].n===2){cat=2;tie=[groups[0].face,...groups.slice(1).map(g=>g.face).sort((a,b)=>b-a)];}
+      else{cat=1;tie=sorted;}
+      return {cat,tie,name:ranking[cat]};
+    }
+    function compareHands(a,b){
+      if(a.cat!==b.cat) return a.cat-b.cat;
+      for(let i=0;i<Math.max(a.tie.length,b.tie.length);i++){
+        const diff=(a.tie[i]||0)-(b.tie[i]||0);
+        if(diff) return diff;
+      }
+      return 0;
+    }
+    function valueName(value) {return S.diceMode==='poker'?pokerNames[value]:(String(value));}
+    function pokerArt(value){
+      const rank=pokerRanks[value],suit=pokerSuits[value];
+      const red=value===2||value===4||value===6;
+      const ink=red?'#b13a38':'#263246';
+      const corner='<text x="10" y="27" class="rank" font-size="24">'+rank+'</text>'+
+        '<text x="11" y="39" font-size="13" fill="'+ink+'">'+suit+'</text>';
+      let icon;
+      if(value===3||value===4||value===5){
+        // Kleine Spielkarten-Figuren: Gekroenter Koenig, Dame mit Diadem, Bube mit Kappe.
+        const crown=value===5?
+          '<path d="M30 36 L27 20 L36 27 L43 14 L50 27 L60 20 L57 36Z" fill="#d8af57" stroke="#8d6e39" stroke-width="2"/><circle cx="43" cy="16" r="3" fill="'+ink+'"/>':
+          value===4?'<path d="M30 34 L33 23 L40 28 L44 17 L49 28 L58 23 L60 34Z" fill="#d8b76c" stroke="#a48349" stroke-width="2"/><circle cx="44" cy="17" r="3" fill="'+ink+'"/>':
+          '<path d="M28 37 L30 25 L43 30 L54 21 L62 32 L57 39Z" fill="'+ink+'" stroke="#c2a46b" stroke-width="2"/><circle cx="55" cy="21" r="3" fill="#d9b96b"/>';
+        icon='<g transform="translate(3,6)">'+
+          '<path d="M22 85 Q20 63 34 58 L47 62 L58 55 Q70 64 69 85Z" fill="'+ink+'" stroke="#c3a36e" stroke-width="2"/>'+
+          '<path d="M36 64 L44 79 L52 62" fill="none" stroke="#e5ba74" stroke-width="3"/>'+
+          '<path d="M34 36 Q33 50 43 55 Q54 49 53 36Z" fill="#e8c9a0" stroke="#9a7761" stroke-width="2"/>'+
+          '<path d="M33 35 Q29 48 38 49 Q34 43 36 37Z" fill="'+ink+'"/>'+
+          '<path d="M51 37 Q60 45 52 50 L50 40Z" fill="'+ink+'"/>'+
+          '<circle cx="39" cy="42" r="1.5" fill="#443a38"/><circle cx="48" cy="42" r="1.5" fill="#443a38"/>'+
+          '<path d="M40 48 Q44 51 48 48" stroke="#9b6157" stroke-width="1.5" fill="none"/>'+
+          crown+'</g>';
+      }else if(value===6){
+        icon='<text x="50" y="69" text-anchor="middle" font-size="52" font-family="Georgia,serif" font-weight="900" fill="'+ink+'">A</text>'+
+          '<text x="51" y="89" text-anchor="middle" font-size="25" fill="'+ink+'">'+suit+'</text>';
+      }else{
+        icon='<text x="54" y="65" text-anchor="middle" font-size="46" font-family="Georgia,serif" font-weight="900" fill="'+ink+'">'+rank+'</text>'+
+          '<text x="54" y="91" text-anchor="middle" font-size="27" fill="'+ink+'">'+suit+'</text>';
+      }
+      return '<svg class="poker-art" viewBox="0 0 100 100" role="img" aria-label="'+pokerNames[value]+'" xmlns="http://www.w3.org/2000/svg">'+
+        '<path class="line" d="M22 8 H79 M22 92 H79"/>'+corner+'<g transform="rotate(180 50 50)">'+corner+'</g>'+icon+'</svg>';
+    }
+    function faceHTML(value){
+      if(S.diceMode==='poker') return pokerArt(value);
+      return '<span class="die-grid" aria-hidden="true">'+patterns[value].map(pos=>'<span class="pip" style="grid-column:'+((pos%3)+1)+';grid-row:'+(Math.floor(pos/3)+1)+'"></span>').join('')+'</span>';
+    }
+    function diceTransform(value,addX=0,addY=0,addZ=0){
+      const [x,y]=diceRotation[value];
+      return 'rotateX('+(x+addX)+'deg) rotateY('+(y+addY)+'deg) rotateZ('+addZ+'deg)';
+    }
+    function drawDice(){
+      const box=$('dice');box.replaceChildren();
+      S.hand.forEach((value,i)=>{
+        const die=document.createElement('button');
+        die.type='button';die.className='die'+(S.held[i]?' held':'')+(S.rolling&&S.rollingIndices.includes(i)?' rolling':'');
+        const faces=[1,2,3,4,5,6].map(v=>'<span class="die-face '+(S.diceMode==='poker'?'poker':'')+'" data-side="'+v+'">'+faceHTML(v)+'</span>').join('');
+        die.innerHTML='<span class="die-shadow" aria-hidden="true"></span><span class="die-scene" aria-hidden="true"><span class="die-stage"><span class="die-body" style="transform:'+diceTransform(value)+'">'+faces+'</span></span></span>';
+        const canHold=S.phase==='rolling'&&!S.rolling&&S.left>0;
+        die.disabled=!canHold;
+        die.setAttribute('aria-pressed',String(S.held[i]));
+        die.setAttribute('aria-label','Würfel '+(i+1)+': '+valueName(value)+(S.held[i]?', behalten':', nicht behalten'));
+        die.title=canHold?(S.held[i]?'Zum Freigeben anklicken':'Zum Behalten anklicken'):'Würfel '+valueName(value);
+        die.addEventListener('click',()=>{
+          if(S.phase!=='rolling'||S.rolling||S.left<1)return;
+          S.held[i]=!S.held[i];
+          playHoldSound(S.held[i]);
+          drawDice();drawActionControls();drawStatus();
+        });
+        box.append(die);
+      });
+      $('hold-indicators').innerHTML=S.hand.map((_,i)=>'<span>'+(S.held[i]?'✓ FIX':'')+'</span>').join('');
+      $('dice-caption').textContent=S.diceMode==='poker'?'Pokerwürfel · 9 · 10 · B · D · K · A':'Augenwürfel · 1 bis 6';
+      $('dice-mode').disabled=S.rolling;
+    }
+    async function animateDice(changed,faces){
+      const epoch=S.epoch;
+      S.rolling=true;S.rollingIndices=changed.slice();drawDice();drawActionControls();drawStatus();
+      if(!reduced&&changed.length){
+        const rollAnimations=[];
+        let longest=0;
+        for(const i of changed){
+          const die=$('dice').children[i];
+          const stage=die.querySelector('.die-stage');
+          const cube=die.querySelector('.die-body');
+          const shadow=die.querySelector('.die-shadow');
+          const duration=1130+randomInt(390);
+          longest=Math.max(longest,duration);
+          const drift=(randomInt(71)-35),swing=(randomInt(51)-25);
+          const dir=randomInt(2)?1:-1;
+          const xTurns=(2+randomInt(2))*360*dir;
+          const yTurns=(2+randomInt(2))*360*(randomInt(2)?1:-1);
+          const zTurns=360*(randomInt(2)?1:-1);
+          const [finalX,finalY]=diceRotation[faces[i]];
+          const [oldX,oldY]=diceRotation[S.hand[i]];
+          cube.style.transform=diceTransform(faces[i]);
+          const sceneFrames=[
+            {offset:0,transform:'translate(0px, -76px) scale(.87) rotate(-20deg)'},
+            {offset:.18,transform:'translate('+(drift*.38)+'px, -51px) scale(1.08) rotate('+swing+'deg)'},
+            {offset:.39,transform:'translate('+drift+'px, 0px) scale(1.06) rotate('+(-swing*.55)+'deg)'},
+            {offset:.51,transform:'translate('+(drift*.8)+'px, -29px) scale(1.05) rotate('+(swing*.65)+'deg)'},
+            {offset:.67,transform:'translate('+(drift*.48)+'px, 0px) scale(1.025) rotate('+(swing*.3)+'deg)'},
+            {offset:.78,transform:'translate('+(drift*.28)+'px, -12px) scale(1.01) rotate('+(-swing*.15)+'deg)'},
+            {offset:.91,transform:'translate('+(drift*.08)+'px, 0px) scale(1) rotate(0deg)'},
+            {offset:1,transform:'translate(0px, 0px) scale(1) rotate(0deg)'}
+          ];
+          const rotationFrames=[
+            {offset:0,transform:diceTransform(S.hand[i])},
+            {offset:.22,transform:diceTransform(S.hand[i],xTurns*.31,yTurns*.28,zTurns*.31)},
+            {offset:.45,transform:diceTransform(S.hand[i],xTurns*.67,yTurns*.69,zTurns*.66)},
+            {offset:.7,transform:diceTransform(S.hand[i],xTurns*.91,yTurns*.91,zTurns*.91)},
+            {offset:1,transform:diceTransform(faces[i],xTurns,yTurns,zTurns)}
+          ];
+          // Das Finale dreht um ganze Vollkreise weiter, so dass immer exakt
+          // die tatsaechlich gewuerfelte Flaeche oben zu sehen ist.
+          const timing={duration:duration,fill:'both',easing:'linear'};
+          const a=stage.animate(sceneFrames,timing);
+          const b=cube.animate(rotationFrames,{...timing,easing:'cubic-bezier(.16,.64,.26,1)'});
+          const c=shadow.animate([
+            {transform:'scale(.55)',opacity:.20,filter:'blur(11px)'},
+            {offset:.39,transform:'scale(1.2)',opacity:.73,filter:'blur(4px)'},
+            {offset:.51,transform:'scale(.72)',opacity:.35,filter:'blur(8px)'},
+            {offset:.67,transform:'scale(1.06)',opacity:.70,filter:'blur(4px)'},
+            {offset:.79,transform:'scale(.89)',opacity:.50,filter:'blur(6px)'},
+            {transform:'scale(1)',opacity:.8,filter:'blur(5px)'}
+          ],timing);
+          rollAnimations.push(Promise.all([a.finished,b.finished,c.finished].map(p=>p.catch(()=>{}))));
+        }
+        playDiceSound(changed.length,longest/1000);
+        await Promise.all(rollAnimations);
+      }else{
+        playDiceSound(changed.length,.24);
+        await wait(80);
+      }
+      if(epoch!==S.epoch)return false;
+      S.hand=faces.slice();S.rolling=false;S.rollingIndices=[];
+      drawDice();drawActionControls();drawStatus();
+      return true;
+    }
+    function makeSeat(p){
+      const el=document.createElement('article');
+      const status = !p.chips&&(!p.inRound||S.phase==='roundend')?'out':'';
+      el.className='seat'+(p.id===0?' you':'')+(status?' '+status:'')+(S.phase==='betting'&&S.betCursor===p.id?' current':'');
+      const playing=p.inRound;
+      let foot='Bereit';
+      if(status) foot='<span class="bad">AUSGESCHIEDEN</span>';
+      else if(playing&&p.folded) foot='Gepasst';
+      else if(playing&&S.phase==='roundend') foot=p.won?'<span class="good">+'+p.won+' Jetons gewonnen</span>':'Kein Gewinn';
+      else if(playing&&p.chips===0) foot='All-in';
+      else if(playing&&S.phase==='betting') foot=p.street?'Einsatz: '+p.street:'Im Spiel';
+      else if(playing&&p.id!==0&&S.phase==='airolling') foot='Würfelt verdeckt ...';
+      else if(playing&&p.id===0) foot='Dein Platz';
+      else if(playing) foot='Blatt verdeckt';
+      el.innerHTML='<div class="seat-header"><span class="seat-name">'+p.name+'</span><span class="badge '+(p.id===0?'human':'')+'">'+(p.id===0?'SPIELER':'CPU')+'</span></div><div class="bankroll"><span class="coin" aria-hidden="true"></span>'+p.chips+'</div><div class="seat-foot">'+foot+'</div>';
+      return el;
+    }
+    function drawScore(){
+      const board=$('scoreboard'); board.replaceChildren();
+      S.players.forEach(p=>board.append(makeSeat(p)));
+      for(let i=S.players.length;i<4;i++){
+        const empty=document.createElement('article');empty.className='seat empty';empty.innerHTML='<div class="seat-name">FREIER PLATZ</div>';
+        board.append(empty);
+      }
+    }
+    function button(text,kind,action,disabled=false){
+      const b=document.createElement('button'); b.type='button';b.className='btn '+kind;b.textContent=text;b.disabled=disabled;b.addEventListener('click',action);return b;
+    }
+    function drawActionControls(){
+      const a=$('actions');a.replaceChildren();
+      const t=$('action-title'),h=$('action-help');
+      const you=S.players[0];
+      if(S.phase==='lobby'){
+        t.textContent='Willkommen am Tisch!';h.textContent='Starte ein Spiel gegen ein bis drei Computergegner.';
+        a.append(button('Partie starten','primary',()=>showLobby()));
+      }else if(S.phase==='rolling'){
+        t.textContent=S.rolling?'Die Würfel rollen …':'Dein Zug · '+S.left+' Nachwürfe übrig';
+        h.textContent='Würfel zum Behalten anklicken. Alle anderen werden erneut gewürfelt.';
+        const rerollCount=S.held.filter(held=>!held).length;
+        a.append(button('↻ Neu würfeln ('+rerollCount+')','primary',reroll,!S.left||S.rolling||rerollCount===0));
+        a.append(button('Blatt behalten →','soft',finishHuman,S.rolling));
+      }else if(S.phase==='airolling'){
+        t.textContent='Die Gegner sind am Zug …';h.textContent='Ihre Würfel bleiben bis zum Showdown verdeckt.';
+      }else if(S.phase==='betting'){
+        const p=S.players[S.betCursor];
+        if(p&&p.id===0&&p.chips>0&&!p.folded){
+          const due=Math.max(0,S.currentBet-p.street);
+          t.textContent=due?'Einsatzrunde · '+due+' Jetons mitgehen':'Einsatzrunde · Du bist dran';
+          h.textContent=due?'Mitgehen, erhöhen, All-in setzen oder passen.':'Schieben, einen Einsatz eröffnen oder passen.';
+          const othersCanBet=contestants().some(q=>q.id!==0&&q.chips>0);
+          const raiseAllowed=othersCanBet&&S.raises<3&&!p.raised&&p.chips>due;
+          a.append(button(due?'Mitgehen '+Math.min(due,p.chips):'Schieben','primary',()=>doBet(p,'call')));
+          a.append(button('Erhöhen +5','soft',()=>doBet(p,'raise',5),!raiseAllowed));
+          a.append(button('Erhöhen +10','soft',()=>doBet(p,'raise',10),!raiseAllowed));
+          a.append(button('All-in','',()=>doBet(p,'allin'),p.chips===0));
+          a.append(button('Passen','danger',()=>doBet(p,'fold')));
+        }else{
+          t.textContent='Die Gegner setzen …';h.textContent='Warte auf die nächste Entscheidung am Tisch.';
+        }
+      }else if(S.phase==='roundend'){
+        const final = S.endState;
+        t.textContent=final==='win'?'🏆 Du hast gewonnen!':final==='lose'?'Spiel vorbei · Niederlage':'Die Runde ist beendet';
+        h.textContent=final==='win'?'Alle Gegner sind pleite. Der Tisch gehört dir.':final==='lose'?'Du hast keine Jetons mehr.':'Die nächste Runde startet mit allen verbliebenen Spielern.';
+        a.append(button(final?'Neue Partie →':'Nächste Runde →','primary',final?showLobby:startRound));
+      }
+    }
+    function drawStatus(){
+      $('round-indicator').innerHTML='Runde <b>'+(S.round||'–')+'</b>';
+      $('pot-value').textContent=potTotal();
+      const result=handRank(S.hand);
+      $('hand-name').textContent=S.rolling?'Würfel rollen …':(S.round?result.name:'Bereit für die erste Runde?');
+      $('turn-label').textContent=S.rolling?'DEIN WURF':S.phase==='betting'?'DEIN BLATT · EINSATZRUNDE':S.phase==='roundend'?'SHOWDOWN':S.phase==='airolling'?'GEGNER WÜRFELN':'DEIN BLATT';
+      $('felt-note').textContent=S.rolling?'Die Würfel springen und rollen über den Tisch …':S.phase==='rolling'?'Markierte Würfel bleiben liegen. Du kannst jederzeit aufhören.':S.phase==='airolling'?'Die Computer optimieren ihre Würfe. Gleich wird gesetzt.':S.phase==='betting'?'Die Gegner behalten ihre Würfel bis zum Showdown für sich.':S.phase==='roundend'?'Die Gewinne wurden verteilt. Die Jetonstände sind aktualisiert.':'Drei Würfe insgesamt. Wähle, welche Würfel du behalten möchtest.';
+      $('roll-tokens').innerHTML='Nachwürfe '+Array.from({length:2},(_,i)=>'<span class="roll-dot '+(i<S.left&&S.phase==='rolling'?'available':'')+'"></span>').join('');
+    }
+    function drawHistory(){
+      $('events').innerHTML=S.history.slice(0,6).map(e=>'<li><small>RUNDE '+e.round+'</small>'+e.message+'</li>').join('')||'<li><small>INFO</small>Gleich geht es los.</li>';
+    }
+    function drawDetails(){
+      const title=$('details-title'),content=$('details-content');
+      if(S.phase==='roundend'){
+        title.innerHTML='Showdown <span>♦</span>';
+        const playing=activePlayers();
+        content.innerHTML='<div class="showdown">'+playing.map(p=>{
+          const won=p.won>0;
+          return '<div class="showdown-row"><div><b>'+p.name+(p.folded?' · gepasst':'')+'</b><div class="sub">'+(p.folded?'Blatt nicht gewertet':handRank(p.hand).name)+'</div></div><div><div class="mini-dice" aria-label="Würfel: '+p.hand.map(valueName).join(', ')+'">'+p.hand.map(v=>S.diceMode==='poker'?'<span class="mini-poker-face '+([2,4,6].includes(v)?'red':'')+'">'+pokerRanks[v]+'<span class="mini-suit">'+pokerSuits[v]+'</span></span>':unicodeDice[v-1]).join('')+'</div><div class="'+(won?'won':'lost')+'">'+(won?'+'+p.won:'–')+'</div></div></div>';
+        }).join('')+'</div><div class="result-banner '+(S.players[0].won===0?'negative':'')+'">'+S.notes.join('<br>')+'</div>';
+      }else{
+        title.innerHTML='Pokerhände <span>↓ stärker</span>';
+        content.innerHTML='<ol class="hand-list">'+ranking.slice(1).reverse().map((name,i)=>'<li class="'+(S.round&&handRank(S.hand).cat===8-i?'highlight':'')+'"><b>'+name+'</b><span>'+(['5 gleiche','4 gleiche','3 + 2 gleiche','5 in Folge','3 gleiche','2 Paare','2 gleiche','höchster Wert'][i])+'</span></li>').join('')+'</ol>';
+      }
+    }
+    function render(){drawScore();drawDice();drawStatus();drawActionControls();drawDetails();drawHistory();}
+    function clearToast(){ clearTimeout(toastTimer);$('toast').classList.remove('visible'); }
+    function showLobby(){
+      stopDiceSound();
+      stopHoldSounds();
+      S.epoch++;S.phase='lobby';S.round=0;S.players=[];S.history=[];S.notes=[];S.endState=null;S.rolling=false;S.rollingIndices=[];S.hand=[1,1,1,1,1];S.held=[false,false,false,false,false];S.left=2;
+      clearToast();render();
+      $('modal-kicker').textContent='Willkommen im Casino';
+      $('modal-title').textContent='Würfelpoker';
+      $('modal-description').textContent='Spiele mit fünf Würfeln gegen Computergegner. Setze Jetons, verbessere dein Blatt und bringe alle Mitspieler zur Strecke.';
+      $('lobby-dice-mode').value=S.diceMode;
+      updateLobbyPreview();
+      $('overlay').hidden=false;
+      $('start-button').focus();
+    }
+    function startGame(){
+      prepareAudio(); // Browser erlauben Ton nach dieser direkten Spieleraktion.
+      S.diceMode=$('lobby-dice-mode').value==='poker'?'poker':'normal';
+      $('dice-mode').value=S.diceMode;
+      const n=Math.max(1,Math.min(3,Number.parseInt($('opponents').value,10)||2));
+      S.epoch++;
+      S.players=Array.from({length:n+1},(_,id)=>({id,name:names[id],chips:100,inRound:false,folded:false,contributed:0,street:0,hand:[],acted:false,raised:false,won:0}));
+      S.history=[];S.round=0;S.endState=null;
+      $('overlay').hidden=true;
+      log('Alle starten mit 100 Jetons. Viel Glück!');
+      startRound();
+    }
+    function pay(p,amount){
+      const value=Math.max(0,Math.min(Math.floor(amount),p.chips));
+      p.chips-=value;p.contributed+=value;return value;
+    }
+    async function startRound(){
+      if(!S.players.length) return;
+      const epoch=++S.epoch;
+      S.round++;
+      S.phase='rolling';S.rolling=false;S.rollingIndices=[];S.left=2;S.held=[false,false,false,false,false];S.hand=[1,1,1,1,1];S.notes=[];S.endState=null;S.currentBet=0;S.raises=0;S.betCursor=-1;
+      for(const p of S.players){
+        p.inRound=p.chips>0;p.folded=false;p.contributed=0;p.street=0;p.hand=[];p.acted=false;p.raised=false;p.won=0;
+      }
+      const ante=activePlayers().reduce((sum,p)=>sum+pay(p,5),0);
+      log('Alle aktiven Spieler zahlen bis zu 5 Jetons Ante ('+ante+' im Pot).');
+      const newHand=Array.from({length:5},d6);
+      render();
+      await animateDice([0,1,2,3,4],newHand);
+      if(S.epoch!==epoch)return;
+      log('Dein erster Wurf: '+handRank(S.hand).name+'.');
+      render();
+    }
+    async function reroll(){
+      prepareAudio();
+      if(S.phase!=='rolling'||S.rolling||S.left<1) return;
+      const changed=S.held.map((hold,i)=>hold?-1:i).filter(i=>i>=0);
+      if(!changed.length) {toast('Alle fünf Würfel sind fixiert. Gib mindestens einen frei.');return;}
+      S.left--;
+      const next=S.hand.slice();for(const i of changed)next[i]=d6();
+      const ok=await animateDice(changed,next);
+      if(!ok) return;
+      log('Nachwurf: '+handRank(S.hand).name+(S.left?' · noch ein Nachwurf möglich.':'.'));
+      render();
+      if(S.left===0) toast('Keine Nachwürfe mehr. Wähle „Blatt behalten“.');
+    }
+    function cpuKeep(dice){
+      const counts=[0,0,0,0,0,0,0];dice.forEach(x=>counts[x]++);
+      const rank=handRank(dice);
+      if([5,6,8].includes(rank.cat))return [true,true,true,true,true];
+      const max=Math.max(...counts);
+      if(max>=2){
+        const keepVals=[];
+        const pairs=Array.from({length:6},(_,i)=>i+1).filter(face=>counts[face]>=2).sort((a,b)=>counts[b]-counts[a]||b-a);
+        if(max===4||max===3)keepVals.push(pairs[0]);
+        else keepVals.push(...pairs.slice(0,2));
+        return dice.map(x=>keepVals.includes(x));
+      }
+      // Vier verschiedene Werte einer möglichen Straße: Chancen auf die Straße verfolgen.
+      const opts=[[1,2,3,4,5],[2,3,4,5,6]];
+      let best=[];
+      for(const seq of opts){const inSeq=dice.filter(x=>seq.includes(x));if(inSeq.length>best.length)best=inSeq;}
+      if(best.length===4){
+        const values=new Set(best);
+        return dice.map(x=>values.has(x));
+      }
+      // Ohne Kombination bevorzugen die Computer ihre höchsten Würfel.
+      const highest=Math.max(...dice);
+      return dice.map(x=>x===highest);
+    }
+    function cpuRoll(p){
+      let dice=Array.from({length:5},d6);
+      for(let r=0;r<2;r++){
+        const hold=cpuKeep(dice);
+        if(hold.every(Boolean))break;
+        dice=dice.map((v,i)=>hold[i]?v:d6());
+      }
+      return dice;
+    }
+    async function finishHuman(){
+      if(S.phase!=='rolling'||S.rolling)return;
+      const epoch=S.epoch;
+      S.players[0].hand=S.hand.slice();
+      S.phase='airolling';log('Du hältst '+handRank(S.hand).name+'. Die Gegner würfeln.');render();
+      for(const p of activePlayers().filter(p=>p.id!==0)){
+        log(p.name+' würfelt verdeckt …');render();
+        await wait(reduced?80:620);
+        if(epoch!==S.epoch)return;
+        p.hand=cpuRoll(p);
+        log(p.name+' ist bereit.');render();
+      }
+      if(epoch!==S.epoch)return;
+      S.phase='betting';S.betCursor=-1;S.currentBet=0;S.raises=0;
+      for(const p of activePlayers()){p.street=0;p.acted=false;p.raised=false;}
+      log('Einsatzrunde beginnt. Jetzt wird gepokert!');
+      render();advanceBet(-1);
+    }
+    function shouldAct(p){return p.inRound&&!p.folded&&p.chips>0&&(!p.acted||p.street<S.currentBet);}
+    function otherBetters(p){return contestants().some(q=>q.id!==p.id&&q.chips>0);}
+    function canRaise(p){return !p.raised&&S.raises<3&&otherBetters(p)&&p.chips>Math.max(0,S.currentBet-p.street);}
+    function addBet(p,amount){const v=pay(p,amount);p.street+=v;return v;}
+    function doBet(p,kind,size=0){
+      if(S.phase!=='betting'||S.players[S.betCursor]!==p||!shouldAct(p))return;
+      const due=Math.max(0,S.currentBet-p.street);
+      if(kind==='fold'){
+        p.folded=true;p.acted=true;log(p.name+' passt.');
+      }else{
+        const oldBet=S.currentBet;
+        let paid=0;
+        if(kind==='allin')paid=addBet(p,p.chips);
+        else if(kind==='raise'&&canRaise(p))paid=addBet(p,due+Math.max(1,Math.floor(size)));
+        else paid=addBet(p,due);
+        if(p.street>oldBet){
+          S.currentBet=p.street;S.raises++;p.raised=true;
+          for(const q of activePlayers())if(q!==p&&!q.folded)q.acted=false;
+          log(p.name+' erhöht auf '+S.currentBet+' Jetons'+(p.chips===0?' (All-in)!':'!'));
+        }else if(due===0&&paid===0)log(p.name+' schiebt.');
+        else if(p.chips===0)log(p.name+' geht All-in ('+paid+' Jetons)!');
+        else log(p.name+' geht mit ('+paid+' Jetons).');
+        p.acted=true;
+      }
+      render();advanceBet(p.id);
+    }
+    function aiAction(p){
+      const rank=handRank(p.hand);
+      const strength={1:.17,2:.38,3:.58,4:.72,5:.81,6:.92,7:.98,8:1}[rank.cat];
+      const due=Math.max(0,S.currentBet-p.street);
+      const r=randomInt(1000)/1000;
+      if(due>0){
+        const danger=due/Math.max(1,p.chips);
+        if(strength<.3&&(danger>.3||due>=15)&&r<.85)return ['fold'];
+        if(strength<.55&&(danger>.6||due>=30)&&r<.70)return ['fold'];
+        if(strength>.84&&canRaise(p)&&r<.4)return ['raise',10];
+        if(strength>.69&&canRaise(p)&&r<.16)return ['raise',5];
+        return ['call'];
+      }
+      if(canRaise(p)){
+        if(strength>.88&&r<.62)return ['raise',10];
+        if(strength>.67&&r<.38)return ['raise',5];
+        if(strength>.4&&r<.1)return ['raise',5];
+        if(r<.035)return ['raise',5];
+      }
+      return ['call'];
+    }
+    function advanceBet(from){
+      if(S.phase!=='betting')return;
+      const alive=contestants();
+      if(alive.length<=1){settleRound();return;}
+      const canPlay=alive.filter(p=>p.chips>0);
+      // Niemand darf gegen einen bereits All-in befindlichen Gegner alleine weiter erhöhen.
+      if(!canPlay.length||canPlay.length===1&&S.currentBet===0){settleRound();return;}
+      let next=null;
+      for(let offset=1;offset<=S.players.length;offset++){
+        const p=S.players[(from+offset+S.players.length)%S.players.length];
+        if(shouldAct(p)){next=p;break;}
+      }
+      if(!next){settleRound();return;}
+      S.betCursor=next.id;render();
+      if(next.id!==0){
+        const epoch=S.epoch,id=next.id;
+        wait(reduced?95:540+randomInt(400)).then(()=>{
+          if(epoch!==S.epoch||S.phase!=='betting'||S.betCursor!==id)return;
+          const [kind,size]=aiAction(next);doBet(next,kind,size||0);
+        });
+      }
+    }
+    function settleRound(){
+      if(S.phase!=='betting')return;
+      S.phase='roundend';S.betCursor=-1;
+      const tiers=Array.from(new Set(activePlayers().map(p=>p.contributed).filter(x=>x>0))).sort((a,b)=>a-b);
+      const pots=[];let last=0;
+      for(const level of tiers){
+        const contributors=activePlayers().filter(p=>p.contributed>=level);
+        const amount=(level-last)*contributors.length;last=level;
+        if(!amount)continue;
+        let eligible=contributors.filter(p=>!p.folded);
+        // Ungecallte / von ausgeschiedenen Setzern stammende Jetons bleiben im Pot.
+        if(!eligible.length)eligible=contestants();
+        if(!eligible.length)throw new Error('Keine gewinnberechtigten Spieler');
+        const best=eligible.reduce((acc,p)=>!acc||compareHands(handRank(p.hand),handRank(acc.hand))>0?p:acc,null);
+        const winners=eligible.filter(p=>compareHands(handRank(p.hand),handRank(best.hand))===0);
+        const each=Math.floor(amount/winners.length),extra=amount%winners.length;
+        const ordered=winners.slice().sort((a,b)=>((a.id-S.round+S.players.length*100)%S.players.length)-((b.id-S.round+S.players.length*100)%S.players.length));
+        for(let i=0;i<ordered.length;i++){ordered[i].chips+=each+(i<extra?1:0);ordered[i].won+=each+(i<extra?1:0);}
+        pots.push({amount,winners:ordered});
+      }
+      const total=pots.reduce((sum,p)=>sum+p.amount,0);
+      S.notes=pots.map((pot,i)=>(pots.length>1?(i===0?'Hauptpot':'Nebenpot '+i)+': ':'')+pot.winners.map(p=>p.name).join(' & ')+' gewinnen '+pot.amount+' Jetons'+(pot.winners.length>1?' (geteilt)':''));
+      if(!S.notes.length)S.notes=['Keine Jetons im Pot.'];
+      const busted=S.players.filter(p=>p.inRound&&p.chips<=0);
+      for(const p of busted)log(p.name+' ist pleite und scheidet aus!');
+      const you=S.players[0];
+      if(you.chips<=0){S.endState='lose';log('Niederlage: Deine Jetons sind aufgebraucht.');}
+      else if(S.players.every(p=>p.id===0||p.chips<=0)){S.endState='win';log('SIEG! Alle Gegner sind ausgeschieden.');}
+      else log('Showdown! '+S.notes.join(' · '));
+      S.notes.push('Rundenpot: '+total+' Jetons.');
+      render();
+    }
+    function updateLobbyPreview(){
+      const mode=$('lobby-dice-mode').value;
+      const previous=S.diceMode;
+      S.diceMode=mode;
+      $('lobby-dice-preview').innerHTML=[1,2,3,4,5,6].map(v=>'<span class="preview-die" title="'+valueName(v)+'">'+faceHTML(v)+'</span>').join('');
+      S.diceMode=previous;
+    }
+    $('sound-toggle').addEventListener('click',()=>{
+      audioEnabled=!audioEnabled;
+      if(audioEnabled)prepareAudio();else {stopDiceSound();stopHoldSounds();}
+      updateSoundButton();
+    });
+    $('lobby-dice-mode').addEventListener('change',updateLobbyPreview);
+    $('dice-mode').addEventListener('change',()=>{
+      if(S.rolling)return;
+      S.diceMode=$('dice-mode').value==='poker'?'poker':'normal';
+      $('lobby-dice-mode').value=S.diceMode;
+      updateLobbyPreview();
+      render();
+    });
+    $('start-button').addEventListener('click',startGame);
+    $('restart-button').addEventListener('click',showLobby);
+    $('rules-button').addEventListener('click',()=>{
+      const current=$('rules-modal');
+      if(current){current.remove();return;}
+      const veil=document.createElement('div');veil.id='rules-modal';veil.className='veil';
+      veil.innerHTML='<div class="modal" role="dialog" aria-modal="true" aria-labelledby="rules-title"><span class="mark" aria-hidden="true">⚄</span><h2 id="rules-title">Spielregeln</h2><div class="rules open"><p><b>Ziel:</b> Bring deine Gegner auf 0 Jetons, bevor dein eigener Vorrat aufgebraucht ist.</p><p><b>Würfeln:</b> Du würfelst mit fünf Würfeln. Danach kannst du bis zu zweimal beliebig viele Würfel neu werfen. Ein Klick markiert einen Würfel zum Behalten. Computergegner würfeln verdeckt.</p><p><b>Einsatz:</b> Zu Beginn jeder Runde zahlen alle aktiven Spieler 5 Jetons (oder ihr gesamtes Restguthaben) in den Pot. Nach dem Würfeln darfst du schieben/mitgehen, um 5 oder 10 erhöhen, All-in gehen oder passen. Die Computer entscheiden ebenfalls. Pro Einsatzrunde gibt es maximal drei Erhöhungen.</p><p><b>Würfelarten:</b> Klassische Würfel zeigen 1 bis 6. Pokerwürfel zeigen 9, 10, Bube, Dame, König, Ass. Die Reihenfolge ist aufsteigend; das Ass ist am höchsten. Die Regeln sind identisch und die Würfelart kann jederzeit (außer während eines Wurfes) umgestellt werden.</p><p><b>Wertung:</b> Fünfling &gt; Vierling &gt; Full House &gt; Straße (1–5 oder 2–6) &gt; Drilling &gt; Zwei Paare &gt; Paar &gt; höchste Würfel. Bei gleichen Kombinationen entscheiden die jeweils höheren Würfel. Absolut gleiche Blätter teilen den Pot; All-in-Nebenpots werden separat verteilt.</p></div><button type="button" class="btn primary" id="close-rules">Verstanden</button></div>';
+      document.body.append(veil);
+      const close=()=>{veil.remove();$('rules-button').focus()};
+      $('close-rules').addEventListener('click',close);
+      veil.addEventListener('click',e=>{if(e.target===veil)close()});
+      veil.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+      $('close-rules').focus();
+    });
+    updateLobbyPreview();
+    updateSoundButton();
+    render();
+  })();
+  </script>
+</body>
+</html>
