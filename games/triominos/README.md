@@ -1,8 +1,10 @@
 # Triominos · Browser Edition 🔺
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
-Das verwandte Spiel zu Dominoes, aber mit Dreiecken statt Rechtecken. Lege Steine, sammle Punkte, oder stecke fest und pass.
+Das Pendant zu Domino, aber mit Dreiecken statt Rechtecken. Lege Steine, sammle Punkte, oder stecke fest und pass.
 
 ## Wie man spielt
 
@@ -16,7 +18,7 @@ Das verwandte Spiel zu Dominoes, aber mit Dreiecken statt Rechtecken. Lege Stein
 ✅ Mehrere Spieler-Modi  
 ✅ Score-Tracking  
 ✅ Undo-Funktion (wo vorhanden)  
-⚠️ Validierung von gültigen Moves manchmal fragwürdig
+⚠️ Validierung von gültigen Zügen manchmal fragwürdig
 
 ## Known Issues
 

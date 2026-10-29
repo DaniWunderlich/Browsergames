@@ -1,5 +1,7 @@
 # KABELSALAT TV 1991 — Die große Fernsehsatire 📺🎬
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
 Metaspiel über Fernsehen. Moderiere eine Sendung, verstricke dich in Kabelsalat (buchstäblich), reagiere auf chaotische Ereignisse. VERY meta. Very 90s.

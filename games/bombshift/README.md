@@ -1,5 +1,7 @@
 # BOMB//SHIFT — Retro Arcade ⚡💣
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
 Schnelles Action-Arcade-Game. Shiften, ausweichen, Bomben werfen, überleben. Alles in Retro-Ästhetik.

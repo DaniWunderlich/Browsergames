@@ -1,8 +1,10 @@
 # MILOPS // ECHO FRONT – Hex Tactics 🎯
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
-Strategisches Hexagon-Taktikspiel im "vielleicht-gibt-es-einen-Plot"-Modus. Bewege Einheiten auf einem Hexagon-Grid und hofffe, dass die KI-Gegner sich nicht teleportieren.
+Strategisches Hexagon-Taktikspiel im "vielleicht-gibt-es-einen-Plot"-Modus. Bewege Einheiten auf einem Hexagon-Grid und hoffe, dass die KI-Gegner sich nicht teleportieren.
 
 ## Wie man spielt
 
@@ -20,7 +22,7 @@ Strategisches Hexagon-Taktikspiel im "vielleicht-gibt-es-einen-Plot"-Modus. Bewe
 
 ## Known Issues
 
-- Einheiten phasenanpassend manchmal durch Mauern
+- Einheiten laufen manchmal durch Wände
 - KI-Zug dauert länger als erwartet (denkt nach? macht Fehler? niemand weiß)
 - Nebel-Effekte können Performance killen
 

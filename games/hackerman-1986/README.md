@@ -1,5 +1,7 @@
 # HACKERMAN 1986 // GHOSTLINE 💻👻
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
 Ein Hacker-Simulator aus der Vergangenheit mit Cyberpunk-Vibes. Durch Code-Labyrinthe navigieren, Systeme infiltrieren, oder auf der GHOSTLINE kommunizieren.
@@ -16,13 +18,13 @@ Ein Hacker-Simulator aus der Vergangenheit mit Cyberpunk-Vibes. Durch Code-Labyr
 ✅ GHOSTLINE-Kommunikation  
 ✅ System-Infiltration  
 ✅ Retro-Terminal-Ästhetik  
-⚠️ Spiellogik optional transparent
+⚠️ Spiellogik teilweise unklar
 
 ## Known Issues
 
 - Befehle manchmal nicht erkannt (oder ignoriert)
 - GHOSTLINE-Chat kann crashen
-- Terminal-Output manchmal garbled
+- Terminal-Output manchmal unleserlich
 
 ## Schwierigkeitsgrad
 

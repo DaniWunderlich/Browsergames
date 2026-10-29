@@ -1,5 +1,7 @@
 # CRYPT & CARDS — Dungeon Deckbuilder 🃏💀
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
 Deckbuilder-Roguelike. Starte mit wenigen Karten, baue dein Deck auf, kämpfe durch Dungeon-Level, hoffe dass deine Strategie aufgeht (wird sie nicht).
@@ -7,7 +9,7 @@ Deckbuilder-Roguelike. Starte mit wenigen Karten, baue dein Deck auf, kämpfe du
 ## Wie man spielt
 
 - **Ziel:** Alle Dungeon-Level überstehen ohne zu sterben
-- **Steuerung:** Wähle Karten aus, play sie, schau was passiert
+- **Steuerung:** Wähle Karten aus, spiele sie, schau was passiert
 - **Strategie:** Synergien finden, Deck bauen, adaptieren
 
 ## Features

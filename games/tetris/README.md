@@ -1,5 +1,7 @@
 # NEON BLOCKS — Browser Tetris 🟨🟦
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
 Das legendäre Tetris in Browser-Form mit Neon-Flair. Stack es, clear es, bis du pleite bist.

@@ -1,8 +1,10 @@
 # SPACE WRECK – Voidbreach Tactics 🚀🌌
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
-Science-Fiction Taktikspiel im All. Deine Raumschiff-Crews kämpfen gegen die Mysterien des Void. Oder gegeneinander. Ist eigenlich egal, solange es explodiert.
+Science-Fiction Taktikspiel im All. Deine Raumschiff-Crews kämpfen gegen die Mysterien des Void. Oder gegeneinander. Es ist eigentlich egal, solange es explodiert.
 
 ## Wie man spielt
 

@@ -1,5 +1,7 @@
 # Jewel Rush // Retro Match-3 💎✨
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
 Match-3 Puzzle im Retro-Style. Vertausche Edelsteine, bilde Reihen aus 3+, verdiene Punkte, erhöhe deinen Score.

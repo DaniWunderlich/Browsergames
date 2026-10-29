@@ -1,5 +1,7 @@
 # AGILEGEDDON! – Die Sprint-Safari 🏃‍♂️💨
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
 Eine wilde Mischung aus Agile-Methodologie und Arcade-Action. Die Sprints sind kurz, die Fehler schnell, und der Chaos-Management ist dein bester Freund.
@@ -7,7 +9,7 @@ Eine wilde Mischung aus Agile-Methodologie und Arcade-Action. Die Sprints sind k
 ## Wie man spielt
 
 - **Ziel:** Sprints abschließen, bevor das Burndown-Chart dir zeigt, wie sehr du gescheitert hast
-- **Steuerung:** Tastatur/Maus – bewegen, clicken, hoffen
+- **Steuerung:** Tastatur/Maus – bewegen, klicken, hoffen
 - **Schwierigkeit:** Mittelschwer bis "warum passiert mir das?"
 
 ## Features

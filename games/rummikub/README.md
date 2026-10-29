@@ -1,8 +1,10 @@
 # Rummikub · Retro Browser Edition 🎲
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
-Der Klassiker aus Omas Spielzimmer – jetzt am Browser! Kombiniere Nummern-Sets, bilde Sequenzen, vermeide es zu verlieren (oder verliere einfach ehrenvoll).
+Der Klassiker aus Omas Spielzimmer – jetzt im Browser! Kombiniere Nummern-Sets, bilde Sequenzen, vermeide es zu verlieren (oder verliere einfach ehrenvoll).
 
 ## Wie man spielt
 

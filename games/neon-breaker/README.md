@@ -1,8 +1,10 @@
 # Neon Breaker — Retro Brick Arcade 🎨🧱
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
-Brick-Breaker mit Neon-Vibes. Zerstöre farbige Steine mit dem Ball, catcher nicht das Paddel verpassen, überlebe Level um Level.
+Brick-Breaker mit Neon-Vibes. Zerstöre farbige Steine mit dem Ball, verfehle nicht das Paddel, überlebe Level um Level.
 
 ## Wie man spielt
 
@@ -22,7 +24,7 @@ Brick-Breaker mit Neon-Vibes. Zerstöre farbige Steine mit dem Ball, catcher nic
 
 - Ball-Spin manchmal sehr spinny
 - Power-ups können sich überlappen (macht es konfus)
-- Performance bei vielen Partikeln schlechterer
+- Performance bei vielen Partikeln schlechter
 
 ## Schwierigkeitsgrad
 

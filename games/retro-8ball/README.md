@@ -1,5 +1,7 @@
 # AFTER HOURS • Retro 8-Ball 🎱
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
 Pool/Billard im Retro-Stil. Nach Feierabend (AFTER HOURS) spielen wir Billard. Stoße an, versenke Kugeln, hoffe die Physik stimmt.

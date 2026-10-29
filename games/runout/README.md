@@ -1,8 +1,10 @@
 # RUNOUT 1.2 — Retro Arcade Road Challenge 🚗
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
-Fahre durch eine endlose Straße, weiche Hindernissen aus, sammle Power-ups, vermeide Crashes. Version 1.2 (also verbesserter als 1.1, aber nicht perfekt).
+Fahre durch eine endlose Straße, weiche Hindernissen aus, sammle Power-ups, vermeide Crashes. Version 1.2 (also besser als 1.1, aber nicht perfekt).
 
 ## Wie man spielt
 
@@ -26,7 +28,7 @@ Fahre durch eine endlose Straße, weiche Hindernissen aus, sammle Power-ups, ver
 
 ## Schwierigkeitsgrad
 
-⭐⭐⭐ Konsistent middling
+⭐⭐⭐ Konstant mittelschwer
 
 ---
 

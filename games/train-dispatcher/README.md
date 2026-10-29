@@ -1,5 +1,7 @@
 # STELLWERK '86 – Train Dispatcher 🚂
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
 Züge dirigieren wie ein Maestro – aber alle Musikanten ignorieren die Noten. Ein Echtzeit-Taktik-Puzzle über Rail-Management und kontrolliertes Chaos.
@@ -21,7 +23,7 @@ Züge dirigieren wie ein Maestro – aber alle Musikanten ignorieren die Noten. 
 ## Known Issues
 
 - Züge können "stecken bleiben" wenn du pech hast
-- Weichen-Timing ist kritisch (und unintuiv)
+- Weichen-Timing ist kritisch (und nicht intuitiv)
 - Crash-Animation looped manchmal endlos
 
 ## Schwierigkeitsgrad

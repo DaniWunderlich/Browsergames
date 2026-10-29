@@ -1,5 +1,7 @@
 # MINIMATES — Retro Rescue 🕹️👶
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
 Pixeliges Rettungs-Adventure. Kleine Charaktere müssen Ärger entkommen, durch Level springen, sammeln, überleben.
@@ -20,7 +22,7 @@ Pixeliges Rettungs-Adventure. Kleine Charaktere müssen Ärger entkommen, durch 
 
 ## Known Issues
 
-- Jump-Physik manchmal haftet an Wänden
+- Jump-Physik bleibt manchmal an Wänden hängen
 - Schwierigkeit sprunghaft zwischen Level
 - Collision-Detection manchmal zu tolerant
 

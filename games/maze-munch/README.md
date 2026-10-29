@@ -1,5 +1,7 @@
 # MAZE MUNCH · Browser Arcade 🕹️👻
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
 Klassischer Maze-Runner mit Ghosts und Pellets. Retro-Arcade-Feeling trifft Browser-Kompatibilität.

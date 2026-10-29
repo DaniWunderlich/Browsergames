@@ -1,5 +1,7 @@
 # Crimson Sorceress — Fantasy Pinball 1986 🔮🎯
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
 Flipper-Spiel mit magischem Fantasy-Setting. Rote Hexe, bunte Ziele, Pinball-Chaos im Mittelalterlook.

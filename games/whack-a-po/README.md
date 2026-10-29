@@ -1,5 +1,7 @@
 # WHACK-A-PO! — Der Sprint schlägt zurück 🔨😤
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
 Product Owner Whack-A-Mole Parodie. Ein PO taucht auf, du schlagst (oder ignorierst) ihn, er taucht wieder auf. Sprint-Humor trifft Arcade.
@@ -7,7 +9,7 @@ Product Owner Whack-A-Mole Parodie. Ein PO taucht auf, du schlagst (oder ignorie
 ## Wie man spielt
 
 - **Ziel:** Möglichst schnell auf die auftauchenden POs hauen, bevor sie verschwinden
-- **Steuerung:** Maus – klicke auf POs wen sie erscheinen
+- **Steuerung:** Maus – klicke auf POs wenn sie erscheinen
 - **Schwierigkeit:** Tempo nimmt zu, Hitbox wird winzig
 
 ## Features

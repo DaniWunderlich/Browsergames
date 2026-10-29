@@ -1,5 +1,7 @@
 # CODERS vs. CLOWNS – Agile Apocalypse 👨‍💻 vs 🤡
 
+![Screenshot](screenshot.png)
+
 ## Das Spiel
 
 Ein chaotisches Duell zwischen den zwei mächtigsten Kräften der Unternehmenskultur: Programmierer und Clowns. Nur einer wird überleben.
