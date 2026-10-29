@@ -1,6 +1,6 @@
 # 🎮 Browser Games — Prototyp Paradise
 
-Willkommen in einer Sammlung von **25 vollständig funktionierenden (und teilweise funktionierenden) Browser-Spielen**. 
+Willkommen in einer Sammlung von **26 vollständig funktionierenden (und teilweise funktionierenden) Browser-Spielen**. 
 
 > ⚠️ **Wichtiger Disclaimer:** Das hier sind **Prototypen**. **Fun Projects**. Die sollen vor allem eins: Spaß machen. Bugs? Natürlich. Glitches? Garantiert. Crashes bei unerwarteten Eingaben? Sehr wahrscheinlich. Aber genau das macht sie charmant, oder? 🐛✨
 
@@ -29,6 +29,7 @@ Willkommen in einer Sammlung von **25 vollständig funktionierenden (und teilwei
 ### 🃏 Klassische Brettspiele
 | Game | Beschreibung | Link |
 |------|-------------|------|
+| **Backgammon** | The Felt Club – Klassiker mit Verdopplungswürfel & 3D-Würfeln | [→ Details](games/backgammon/README.md) |
 | **DUNSCHTIGS JASS** | Schwizer Charte-Klassiker – Mittwoch im Browser | [→ Details](games/dunschtigs-jass/README.md) |
 | **Rummikub** | Der Klassiker – Browser Edition | [→ Details](games/rummikub/README.md) |
 | **Triominos** | Domino meets Triangle – Kniffliger als es aussieht | [→ Details](games/triominos/README.md) |

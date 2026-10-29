@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#091a19">
+<title>Backgammon · The Felt Club</title>
+<style>
+:root{color-scheme:dark;--bg:#091715;--panel:#102522;--panel2:#17312d;--felt:#174d43;--gold:#e7bd77;--gold-dim:#aa8857;--cream:#f6e6c8;--ink:#d5e3db;--muted:#97b0a5;--edge:#335149;--red:#a34c44;--accent:#d6a85e;--good:#7adab0;--danger:#ef907f}
+*{box-sizing:border-box}html,body{min-height:100%;margin:0}body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:radial-gradient(ellipse at 42% -30%,#29534a 0,transparent 48%),radial-gradient(ellipse at 100% 60%,#142d29 0,transparent 43%),var(--bg);font-size:15px}
+button,select{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.36;filter:saturate(.5)}button:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--good);outline-offset:3px}
+.app{max-width:1600px;padding:24px clamp(14px,2.5vw,40px) 32px;margin:auto}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:22px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px}.brand-icon{width:47px;height:47px;border:1px solid #b48a55;border-radius:13px;background:linear-gradient(155deg,#385c4d,#102c28);display:grid;place-items:center;color:var(--gold);font-family:Georgia,serif;font-size:34px;box-shadow:0 6px 28px #0006}.brand-name{font-family:Georgia,'Times New Roman',serif;letter-spacing:.025em;font-size:clamp(25px,2.5vw,34px);line-height:1}.brand-tag{font-size:10px;letter-spacing:.22em;color:var(--gold-dim);font-weight:800;margin-top:7px}.top-actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.ghost-btn{border:1px solid #3c5850;background:#17302b;color:#dae5da;padding:10px 15px;border-radius:10px;font-size:12px;font-weight:800;letter-spacing:.035em;transition:background .15s,border-color .15s}.ghost-btn:hover:not(:disabled){background:#25463d;border-color:#8a9c7a}.ghost-btn.icon-btn{font-size:18px;width:42px;height:42px;padding:0}
+.scoreboard{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:stretch;border:1px solid var(--edge);background:linear-gradient(135deg,#142b27,#112521);border-radius:16px;overflow:hidden;margin-bottom:20px;box-shadow:0 14px 36px #0002}
+.player-score{display:flex;align-items:center;gap:15px;padding:16px 19px;min-width:0}.player-score.right{flex-direction:row-reverse;text-align:right}.checker-token{width:40px;height:40px;flex:none;border-radius:100%;box-shadow:inset 0 3px 3px #ffffff33,inset 0 -5px 5px #0006,0 4px 10px #0007;border:3px double #aa9774}.checker-token.light{background:radial-gradient(circle at 38% 25%,#fffaf0,#dac4a0 80%);border-color:#f7eacb}.checker-token.dark{background:radial-gradient(circle at 40% 20%,#ad5d53,#552820 85%);border-color:#ba7564}.player-copy{min-width:0}.player-copy strong{display:block;font-size:16px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap}.player-copy span{font-size:12px;color:var(--muted)}.score-num{font-family:Georgia,serif;font-size:32px;color:var(--cream);margin-left:auto}.player-score.right .score-num{margin-left:0;margin-right:auto}.player-score.active{background:#2e564233;box-shadow:inset 0 -3px 0 var(--gold)}.player-score .onturn{display:none}.player-score.active .onturn{display:inline;color:var(--good)}
+.match-centre{text-align:center;align-self:center;min-width:145px;border-left:1px solid var(--edge);border-right:1px solid var(--edge);padding:9px 16px}.match-centre strong{display:block;font-family:Georgia,serif;color:var(--gold);font-size:20px}.match-centre small{display:block;color:var(--muted);font-size:10px;letter-spacing:.14em;text-transform:uppercase}.crawford-pill{display:none;margin-top:5px;color:#f5d497;font-size:10px;font-weight:800}.crawford-pill.show{display:block}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 337px;gap:20px;align-items:start}
+.board-column{min-width:0}.board-shell{position:relative;border-radius:17px;padding:10px;background:linear-gradient(155deg,#84603e,#392b20 17%,#35291d 86%,#9a7047);border:1px solid #ad8053;box-shadow:0 20px 54px #0008,inset 0 2px 1px #fff3}.board-svg{width:100%;height:auto;display:block;user-select:none;touch-action:pan-y}.board-svg [data-target]{cursor:pointer}.board-svg [data-target]:hover .point-hover{opacity:.12}.board-svg .glowable{transition:opacity .12s}.board-hint{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#afc2b6;font-size:12px;padding:12px 8px 0;min-height:44px}.board-hint .key{display:inline-block;border:1px solid #48655a;color:#e1c79d;padding:1px 6px;border-radius:5px;margin-left:5px}
+.sidebar{display:flex;flex-direction:column;gap:15px}.card{border:1px solid var(--edge);border-radius:16px;background:linear-gradient(155deg,#18342f,#102723 78%);box-shadow:0 12px 25px #0002;padding:19px}.eyebrow{font-size:10px;color:var(--gold-dim);letter-spacing:.17em;text-transform:uppercase;font-weight:900}.card-title{font-family:Georgia,serif;font-size:24px;color:var(--cream);margin:6px 0 10px}.turn-message{font-size:14px;min-height:43px;line-height:1.5;color:#c9dfd1;margin:5px 0 14px}.turn-message strong{color:var(--gold)}
+.dice-table{background:radial-gradient(ellipse at 50% 25%,#31554a,#14362f 80%);border:1px solid #3c6154;box-shadow:inset 0 0 22px #0d211c;border-radius:13px;min-height:140px;display:flex;align-items:center;justify-content:center;gap:26px;padding:19px 13px;overflow:hidden}.die-wrap{height:86px;width:85px;display:grid;place-items:center;perspective:700px;position:relative}.die-wrap:after{content:'';position:absolute;bottom:0;left:14%;right:14%;height:12px;border-radius:100%;background:#0008;filter:blur(7px)}.die3d{--size:67px;--half:33.5px;position:relative;width:var(--size);height:var(--size);transform-style:preserve-3d;transform:rotateX(-23deg) rotateY(-28deg);z-index:1}.die3d.rolling{filter:drop-shadow(0 10px 15px #0007)}.die-face{position:absolute;inset:0;border-radius:11px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:11px;gap:3px;align-items:center;justify-items:center;background:linear-gradient(140deg,#fffcf3,#eddcba 65%,#cead7d);border:2px solid #e4ca99;box-shadow:inset 0 1px 0 #fff,inset -3px -5px 11px #95735033}.die-dark .die-face{background:linear-gradient(140deg,#aa645b,#75382f 65%,#4e201c);border-color:#b07a67;box-shadow:inset 0 1px 0 #efb0a166,inset -3px -5px 10px #16040355}.die-face.face1{transform:translateZ(var(--half))}.die-face.face6{transform:rotateY(180deg) translateZ(var(--half))}.die-face.face3{transform:rotateY(90deg) translateZ(var(--half))}.die-face.face4{transform:rotateY(-90deg) translateZ(var(--half))}.die-face.face2{transform:rotateX(90deg) translateZ(var(--half))}.die-face.face5{transform:rotateX(-90deg) translateZ(var(--half))}.pip{width:11px;height:11px;border-radius:50%;background:#57463b;box-shadow:inset 0 2px 2px #0007,0 1px 0 #fff7}.die-dark .pip{background:#f0d4ae;box-shadow:inset 0 1px 1px #2c130fa8,0 1px 0 #c99d8580}
+.dice-caption{display:flex;justify-content:space-between;color:#88a698;font-size:11px;margin:9px 3px 7px;gap:6px}.dice-remaining{display:flex;gap:6px;min-height:36px;align-items:center;flex-wrap:wrap}.die-chip{border:1px solid #af8a5f;border-radius:7px;padding:5px 10px;background:#e5d3b3;color:#372c24;font-weight:900;box-shadow:0 2px 0 #987b58;min-width:32px;text-align:center}.empty-dice{font-size:12px;color:#91aaa0}
+.btn-primary{width:100%;padding:15px 18px;border:none;border-radius:10px;background:linear-gradient(180deg,#f1ce90,#c9964b);color:#382617;font-weight:900;letter-spacing:.04em;box-shadow:0 4px 0 #795329,0 8px 15px #0004;transition:filter .15s,transform .15s}.btn-primary:hover:not(:disabled){filter:brightness(1.12)}.btn-primary:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 #795329}.button-pair{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}.small-btn{background:#1f4038;border:1px solid #416657;border-radius:9px;padding:11px 8px;color:#dbebdf;font-size:12px;font-weight:850;min-width:0}.small-btn:hover:not(:disabled){background:#2b564a}.small-btn.accent{color:var(--gold);border-color:#806a48}.info-row{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #365147;padding:12px 0;font-size:13px;gap:10px}.info-row strong{color:#efddbc}.info-row:last-child{padding-bottom:0}.cube-display{width:44px;height:44px;display:grid;place-items:center;border-radius:8px;border:3px solid #b79c6c;box-shadow:2px 3px 0 #654f33,0 5px 8px #0005,inset 0 2px 4px #fff9;background:linear-gradient(135deg,#f8ebd0,#d6b47c);font-size:20px;font-family:Georgia,serif;font-weight:900;color:#4b331b}.chip-count{color:var(--muted);font-size:12px}
+.log-list{max-height:190px;overflow:auto;list-style:none;padding:0;margin:9px 0 0}.log-list li{padding:7px 0;border-bottom:1px solid #31493f;color:#a9c0b3;font-size:12px;line-height:1.45}.log-list li:first-child{color:#ecddbf}.log-list li:last-child{border-bottom:none}.log-list .clock{color:var(--gold-dim);margin-right:7px}.footer{padding:23px 0 0;text-align:center;font-size:11px;letter-spacing:.12em;color:#728f83}
+.overlay{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:20px;background:#020c0bd9;backdrop-filter:blur(8px)}.overlay.hidden{display:none}.modal{width:min(100%,550px);max-height:min(92vh,900px);overflow:auto;background:linear-gradient(135deg,#193831,#0d211e);border:1px solid #856f4c;border-radius:19px;box-shadow:0 25px 100px #000b;padding:clamp(21px,4vw,37px)}.modal-mark{font-size:36px;font-family:Georgia,serif;color:var(--gold)}.modal h2{font-family:Georgia,serif;color:#f2ddb8;font-size:clamp(26px,4vw,36px);margin:4px 0 10px;font-weight:500}.modal p{font-size:14px;color:#b8cec0;line-height:1.6}.form-label{display:block;margin:18px 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.12em;font-weight:800;color:var(--gold-dim)}.choice-row{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.choice-row.triple{grid-template-columns:repeat(3,1fr)}.choice{border:1px solid #49665a;background:#152e29;color:#c6d9cc;padding:12px 7px;border-radius:9px;text-align:center;font-size:13px;font-weight:800}.choice.active{border-color:#e3b979;background:#3a4431;color:#fce3b4;box-shadow:inset 0 0 0 1px #dcad6466}.choice:hover{border-color:#c5a67a}.select{width:100%;background:#152e29;border:1px solid #49665a;border-radius:9px;color:#e9e3d1;padding:12px 14px}.modal .btn-primary{margin-top:23px}.modal-callout{background:#1f4339;border:1px solid #39594c;border-radius:9px;padding:11px 13px;color:#afc6b8;font-size:12px;line-height:1.55;margin-top:19px}.modal-close{float:right;padding:8px 12px;border-radius:8px;border:1px solid #536d61;background:transparent;color:#bdd1c6;font-size:13px}.rule-section{border-top:1px solid #365349;margin-top:15px;padding-top:13px}.rule-section h3{color:#e7c78c;font-size:14px;margin:0 0 3px}.rule-section p{margin:4px 0 0;font-size:13px}.decision-buttons{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:22px}.decision-buttons .btn-primary{margin:0}.result-badge{color:var(--good);font-size:12px;letter-spacing:.17em;font-weight:900;margin-top:16px}.result-score{font-family:Georgia,serif;font-size:38px;color:var(--cream);margin:12px 0}
+@media(min-width:1300px){.layout{grid-template-columns:minmax(0,1fr) 355px}.card{padding:21px}}
+@media(max-width:1050px){.layout{grid-template-columns:minmax(0,1fr)}.sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}.sidebar .log-card{grid-column:1/-1}.board-shell{max-width:1100px;margin:auto}}
+@media(max-width:620px){.app{padding-top:13px}.topbar{margin-bottom:15px}.brand-icon{width:40px;height:40px;font-size:28px}.brand-name{font-size:26px}.top-actions{gap:6px}.ghost-btn{padding:9px 10px}.scoreboard{margin-bottom:13px}.player-score{padding:12px 10px;gap:8px}.checker-token{width:26px;height:26px;border-width:2px}.player-copy strong{font-size:12px}.player-copy span{font-size:10px}.score-num{font-size:25px}.match-centre{min-width:90px;padding:6px}.match-centre strong{font-size:15px}.match-centre small{font-size:9px}.board-shell{padding:3px;border-radius:10px}.sidebar{display:flex;align-items:stretch;gap:10px}.card{padding:15px}.board-hint{font-size:10px;line-height:1.5}.footer{font-size:9px}.dice-table{min-height:122px}.modal{padding:20px}.choice{font-size:12px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+ <header class="topbar">
+  <div class="brand"><div class="brand-icon" aria-hidden="true">♟</div><div><div class="brand-name">Backgammon</div><div class="brand-tag">THE FELT CLUB · OFFLINE EDITION</div></div></div>
+  <div class="top-actions"><button class="ghost-btn" id="rulesBtn">? Regeln</button><button class="ghost-btn icon-btn" id="soundBtn" title="Ton ein-/ausschalten" aria-label="Ton ein-/ausschalten">♫</button><button class="ghost-btn" id="newBtn">↻ Neues Match</button></div>
+ </header>
+ <section class="scoreboard" aria-label="Spielstand">
+  <div class="player-score" id="whiteScore"><div class="checker-token light"></div><div class="player-copy"><strong id="whiteName">Du · Elfenbein</strong><span><span class="onturn">● Am Zug · </span><span id="whiteOff">0</span> / 15 draussen</span></div><div class="score-num" id="whitePoints">0</div></div>
+  <div class="match-centre"><small>Match bis</small><strong id="matchLength">5 Punkte</strong><small id="gameNumber">Partie 1</small><span class="crawford-pill" id="crawfordBadge">CRAWFORD-PARTIE</span></div>
+  <div class="player-score right" id="blackScore"><div class="checker-token dark"></div><div class="player-copy"><strong id="blackName">Computer · Rubin</strong><span><span class="onturn">● Am Zug · </span><span id="blackOff">0</span> / 15 draussen</span></div><div class="score-num" id="blackPoints">0</div></div>
+ </section>
+ <main class="layout">
+  <div class="board-column">
+   <div class="board-shell"><svg class="board-svg" id="board" viewBox="0 0 1180 700" role="img" aria-label="Interaktives Backgammon-Spielbrett. Felder und Steine können angeklickt werden."></svg></div>
+   <div class="board-hint"><span id="boardHelp">Wähle einen deiner Steine und anschliessend ein markiertes Zielfeld.</span><span><span class="key">Klick</span> oder <span class="key">Ziehen</span></span></div>
+  </div>
+  <aside class="sidebar">
+   <section class="card"><div class="eyebrow" id="turnEyebrow">AM ZUG</div><div class="card-title" id="turnTitle">Bereit zum Spielen</div><div class="turn-message" id="turnMessage">Beginne ein Match, um die Eröffnungswürfel zu werfen.</div>
+    <div class="dice-table" aria-label="Animierte Würfel"><div class="die-wrap"><div class="die3d" id="die1"></div></div><div class="die-wrap"><div class="die3d" id="die2"></div></div></div>
+    <div class="dice-caption"><span id="diceCaption">WÜRFEL</span><span id="diceState">—</span></div><div class="dice-remaining" id="remainingDice"><span class="empty-dice">Noch kein Wurf</span></div>
+    <button class="btn-primary" style="margin-top:16px" id="mainAction">Match starten</button><div class="button-pair"><button class="small-btn" id="undoBtn" disabled>↶ Rückgängig</button><button class="small-btn accent" id="doubleBtn" disabled>◇ Verdoppeln</button></div>
+   </section>
+   <section class="card"><div class="eyebrow">PARTIE</div><div class="card-title" style="font-size:21px;margin-bottom:13px">Verdopplungswürfel</div>
+    <div class="info-row" style="border-top:0;padding-top:0"><span>Spielwert</span><span class="cube-display" id="cube">64</span></div><div class="info-row"><span>Würfelrecht</span><strong id="cubeOwner">Beide</strong></div><div class="info-row"><span>Auf der Bar</span><span class="chip-count" id="barInfo">Elfenbein 0 · Rubin 0</span></div><div class="info-row"><span>Spielmodus</span><strong id="modeInfo">Computer</strong></div>
+   </section>
+   <section class="card log-card"><div class="eyebrow">LETZTE AKTIONEN</div><ul id="logList" class="log-list"><li>Bereit für eine neue Partie.</li></ul></section>
+  </aside>
+ </main>
+ <div class="footer">BACKGAMMON · VOLLSTÄNDIG OFFLINE · OHNE EXTERNE ABHÄNGIGKEITEN</div>
+</div>
+<div class="overlay" id="overlay"><div class="modal" id="modal" role="dialog" aria-modal="true" aria-live="polite"></div></div>
+<script>
+'use strict';
+(()=>{
+const $=id=>document.getElementById(id);
+const BOARD=$('board'), OVERLAY=$('overlay'), MODAL=$('modal');
+const PIP_LAYOUT={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+const FACE_ANGLES={1:[0,0],2:[-90,0],3:[0,-90],4:[0,90],5:[90,0],6:[0,180]};
+const FACE_CLASSES={1:'face1',2:'face2',3:'face3',4:'face4',5:'face5',6:'face6'};
+const openingText='Für die Eröffnung würfelt jede Seite einmal. Die höhere Zahl beginnt und spielt beide Zahlen.';
+let options={mode:'ai',difficulty:'normal',target:5}, stagedOptions=null;
+let state=null, epoch=0, pendingTimeouts=new Set(), gameAudio=null, muted=false, dragStart=null, suppressClick=false;
+let dieValues=[1,1], lastDiceDark=[false,true];
+const randomDie=()=>1+Math.floor(Math.random()*6);
+const sideName=p=>p===0?'Elfenbein':'Rubin';
+const playerName=p=>p===0?'Elfenbein':options.mode==='ai'?'Computer':'Rubin';
+const isAI=p=>p===1&&options.mode==='ai';
+const cloneBoard=s=>({points:s.points.slice(),bar:s.bar.slice(),off:s.off.slice()});
+const ownerOf=n=>n>0?0:n<0?1:null;
+const ownCount=(s,p,pt)=>Math.max(0,s.points[pt]*(p===0?1:-1));
+const opponentCount=(s,p,pt)=>Math.max(0,s.points[pt]*(p===0?-1:1));
+const home=(p,pt)=>p===0?pt>=1&&pt<=6:pt>=19&&pt<=24;
+function allHome(s,p){if(s.bar[p])return false;for(let i=1;i<=24;i++)if(ownCount(s,p,i)>0&&!home(p,i))return false;return true;}
+function legalForDie(s,p,die){
+ const dir=p===0?-1:1,moves=[];
+ if(s.bar[p]){const to=p===0?25-die:die;if(opponentCount(s,p,to)<2)moves.push({from:'bar',to,die});return moves;}
+ const bearing=allHome(s,p);
+ for(let pt=1;pt<=24;pt++){
+  if(!ownCount(s,p,pt))continue;
+  const dest=pt+dir*die;
+  if(dest>=1&&dest<=24){if(opponentCount(s,p,dest)<2)moves.push({from:pt,to:dest,die});continue;}
+  if(!bearing)continue;
+  const distance=p===0?pt:25-pt;
+  if(die<distance)continue;
+  if(die>distance){let farther=false;
+   for(let other=1;other<=24;other++)if(ownCount(s,p,other)>0&&(p===0?other>pt:other<pt)){farther=true;break;}
+   if(farther)continue;
+  }
+  moves.push({from:pt,to:'off',die});
+ }
+ return moves;
+}
+function doBoardMove(s,p,m){
+ const next=cloneBoard(s),sgn=p===0?1:-1;
+ if(m.from==='bar')next.bar[p]--;else next.points[m.from]-=sgn;
+ if(m.to==='off')next.off[p]++;
+ else{
+  if(next.points[m.to]===-sgn){next.points[m.to]=0;next.bar[1-p]++;}
+  next.points[m.to]+=sgn;
+ }
+ return next;
+}
+const stateKey=(s,p,dice)=>`${p}|${dice.slice().sort().join('')}|${s.bar.join(',')}|${s.points.slice(1).join(',')}`;
+function maxPlayable(s,p,dice,memo){
+ if(!dice.length)return 0;
+ const key=stateKey(s,p,dice);
+ if(memo.has(key))return memo.get(key);
+ let best=0,seen=new Set();
+ for(let i=0;i<dice.length;i++){
+  const d=dice[i];if(seen.has(d))continue;seen.add(d);
+  const rest=dice.slice();rest.splice(i,1);
+  for(const m of legalForDie(s,p,d)){
+   const candidate=1+maxPlayable(doBoardMove(s,p,m),p,rest,memo);
+   if(candidate>best)best=candidate;
+   if(best===dice.length)break;
+  }
+  if(best===dice.length)break;
+ }
+ memo.set(key,best);return best;
+}
+function nextMoves(s,p,dice){
+ const memo=new Map(),max=maxPlayable(s,p,dice,memo);
+ if(!max)return [];
+ const candidates=[],seen=new Set();
+ for(let i=0;i<dice.length;i++){
+  const d=dice[i];if(seen.has(d))continue;seen.add(d);
+  const rest=dice.slice();rest.splice(i,1);
+  for(const m of legalForDie(s,p,d)){
+   if(1+maxPlayable(doBoardMove(s,p,m),p,rest,memo)===max)candidates.push(m);
+  }
+ }
+ // When just one of two different dice can be played, the higher die is compulsory.
+ if(dice.length===2&&dice[0]!==dice[1]&&max===1){const high=Math.max(...dice);if(candidates.some(m=>m.die===high))return candidates.filter(m=>m.die===high);}
+ return candidates;
+}
+function pipCount(s,p){let n=s.bar[p]*25;for(let pt=1;pt<=24;pt++)n+=ownCount(s,p,pt)*(p===0?pt:25-pt);return n;}
+function blotsExposed(s,p){let risk=0;for(let i=1;i<=24;i++)if(ownCount(s,p,i)===1){
+ let threats=0;for(let d=1;d<=6;d++){let attack=p===0?i-d:i+d;if(attack>=1&&attack<=24&&ownCount(s,1-p,attack)>0)threats++;}
+ if(s.bar[1-p]&&(p===0?i>=19:i<=6))threats+=2;
+ risk+=threats>0?2+Math.min(threats,3)*1.8:0.55;
+ }return risk;}
+function evaluateBoard(s,p){
+ const foe=1-p,pips=pipCount(s,p),theirPips=pipCount(s,foe);
+ let val=(theirPips-pips)*.78+(s.off[p]-s.off[foe])*13+(s.bar[foe]-s.bar[p])*10;
+ val-=blotsExposed(s,p)*2.25;val+=blotsExposed(s,foe)*1.35;
+ for(let i=1;i<=24;i++)if(ownCount(s,p,i)>=2){val+=1.6;
+  if(home(p,i))val+=.95;
+  if(home(foe,i))val+=2.8;
+ }
+ return val;
+}
+function chooseAIMove(){
+ const moves=nextMoves(state,1,state.dice);if(!moves.length)return null;
+ let best=-Infinity,winners=[];
+ for(const m of moves){
+  const next=doBoardMove(state,1,m),before=state,hit=opponentCount(before,1,m.to)==1;
+  let score=evaluateBoard(next,1)+((hit)?9:0);
+  if(options.difficulty==='easy')score+=Math.random()*38;
+  else if(options.difficulty==='normal')score+=Math.random()*9;
+  else score+=Math.random()*2;
+  if(score>best+.0001){best=score;winners=[m];}else if(Math.abs(score-best)<.0001)winners.push(m);
+ }
+ return winners[Math.floor(Math.random()*winners.length)];
+}
+// ---------- Tiny synthesiser: all effects are generated locally with Web Audio ----------
+function audio(){if(muted)return null;try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;if(!gameAudio)gameAudio=new AC();if(gameAudio.state==='suspended')gameAudio.resume().catch(()=>{});return gameAudio;}catch(e){return null;}}
+function noiseAt(ctx,time,duration,filterFreq,volume){
+ const sr=ctx.sampleRate,size=Math.max(128,Math.ceil(sr*duration)),buf=ctx.createBuffer(1,size,sr),a=buf.getChannelData(0);
+ for(let i=0;i<size;i++)a[i]=(Math.random()*2-1)*(1-i/size);
+ const src=ctx.createBufferSource();src.buffer=buf;const hp=ctx.createBiquadFilter();hp.type='bandpass';hp.frequency.value=filterFreq;hp.Q.value=.8;
+ const gain=ctx.createGain();gain.gain.setValueAtTime(Math.max(.001,volume),time);gain.gain.exponentialRampToValueAtTime(.001,time+duration);
+ src.connect(hp);hp.connect(gain);gain.connect(ctx.destination);src.start(time);src.stop(time+duration+.003);
+}
+function thud(ctx,t,vol=.35,pitch=160){
+ const osc=ctx.createOscillator(),g=ctx.createGain();osc.type='triangle';osc.frequency.setValueAtTime(pitch,t);osc.frequency.exponentialRampToValueAtTime(Math.max(50,pitch*.42),t+.075);
+ g.gain.setValueAtTime(.001,t);g.gain.linearRampToValueAtTime(vol,t+.006);g.gain.exponentialRampToValueAtTime(.001,t+.1);
+ osc.connect(g);g.connect(ctx.destination);osc.start(t);osc.stop(t+.105);
+ noiseAt(ctx,t,.045,760+Math.random()*550,vol*.16);
+}
+function rollSound(){const ctx=audio();if(!ctx)return;const now=ctx.currentTime+.03;
+ noiseAt(ctx,now,.37,2100,.085);
+ for(let i=0;i<13;i++){
+  const f=i/12,t=now+.065+i*.066+Math.random()*.024;
+  thud(ctx,t,(.12+f*.1)*(i%3===0?1.3:1),180+Math.random()*260);
+ }
+ thud(ctx,now+.9,.34,155);thud(ctx,now+1.005,.25,190);
+}
+function moveSound(hit=false,bear=false){const ctx=audio();if(!ctx)return;const t=ctx.currentTime+.006;
+ thud(ctx,t,hit?.3:.16,hit?110:250);
+ if(hit){thud(ctx,t+.065,.14,180);noiseAt(ctx,t+.016,.13,1100,.095);}
+ if(bear){thud(ctx,t+.085,.1,500);}
+}
+function uiSound(){const ctx=audio();if(ctx)thud(ctx,ctx.currentTime+.005,.11,340);}
+function buildDie(el){
+ el.innerHTML=[1,6,3,4,2,5].map(n=>`<div class="die-face ${FACE_CLASSES[n]}">${Array.from({length:9},(_,i)=>PIP_LAYOUT[n].includes(i)?'<span class="pip"></span>':'<span></span>').join('')}</div>`).join('');
+}
+buildDie($('die1'));buildDie($('die2'));
+function showDice(values,dark=[false,false]){
+ for(let i=0;i<2;i++){
+  const el=$('die'+(i+1));el.classList.toggle('die-dark',dark[i]);
+  const [x,y]=FACE_ANGLES[values[i]];el.style.transform=`rotateX(${x}deg) rotateY(${y}deg)`;
+ }
+ dieValues=values.slice();lastDiceDark=dark.slice();
+}
+function setTimeoutTracked(fn,delay){const id=setTimeout(()=>{pendingTimeouts.delete(id);fn();},delay);pendingTimeouts.add(id);return id;}
+function cancelTimers(){for(const id of pendingTimeouts)clearTimeout(id);pendingTimeouts.clear();for(const d of [$('die1'),$('die2')]){d.getAnimations().forEach(a=>a.cancel());d.classList.remove('rolling');}}
+async function animateDice(values,dark){
+ rollSound();const animations=[];
+ for(let i=0;i<2;i++){
+  const el=$('die'+(i+1));el.classList.toggle('die-dark',dark[i]);el.classList.add('rolling');
+  const [x,y]=FACE_ANGLES[values[i]],turnsX=(2+Math.floor(Math.random()*2))*360,turnsY=(2+Math.floor(Math.random()*3))*360;
+  const reverse=Math.random()<.5?-1:1,dx=(i?1:-1)*(14+Math.random()*10);
+  const start=FACE_ANGLES[dieValues[i]];
+  const frames=[
+   {transform:`translate3d(0px,0px,0px) rotateX(${start[0]}deg) rotateY(${start[1]}deg)`,offset:0},
+   {transform:`translate3d(${dx}px,-48px,20px) rotateX(${x+turnsX*.38*reverse}deg) rotateY(${y+turnsY*.38}deg)`,offset:.38},
+   {transform:`translate3d(${dx*.5}px,-11px,10px) rotateX(${x+turnsX*.75*reverse}deg) rotateY(${y+turnsY*.75}deg)`,offset:.74},
+   {transform:`translate3d(${dx*.18}px,-19px,5px) rotateX(${x+turnsX*.89*reverse}deg) rotateY(${y+turnsY*.89}deg)`,offset:.86},
+   {transform:`translate3d(0px,0px,0px) rotateX(${x+turnsX*reverse}deg) rotateY(${y+turnsY}deg)`,offset:1}
+  ];
+  const animation=el.animate(frames,{duration:1070+i*95,easing:'cubic-bezier(.23,.39,.18,1)',fill:'forwards'});
+  animations.push(animation.finished.catch(()=>{}));
+ }
+ await Promise.all(animations);
+ for(let i=0;i<2;i++){
+  const el=$('die'+(i+1));el.getAnimations().forEach(a=>a.cancel());el.classList.remove('rolling');
+ }
+ showDice(values,dark);
+}
+function startBoard(){
+ const points=Array(25).fill(0);
+ points[24]=2;points[13]=5;points[8]=3;points[6]=5;
+ points[1]=-2;points[12]=-5;points[17]=-3;points[19]=-5;
+ return {points,bar:[0,0],off:[0,0]};
+}
+function newMatch(){
+ if(stagedOptions){options={...stagedOptions};stagedOptions=null;}
+ cancelTimers();epoch++;
+ const b=startBoard();
+ state={...b,turn:null,phase:'opening',dice:[],roll:[],selected:null,history:[],score:[0,0],cube:1,cubeOwner:null,crawfordUsed:false,crawfordActive:false,gameNumber:1,log:[],lastMove:null,awaitDouble:null,moveCount:0};
+ hideModal();log('Neues Match gestartet.');render();uiSound();
+}
+function nextGame(){
+ cancelTimers();epoch++;
+ const b=startBoard();Object.assign(state,b,{turn:null,phase:'opening',dice:[],roll:[],selected:null,history:[],cube:1,cubeOwner:null,gameNumber:state.gameNumber+1,lastMove:null,awaitDouble:null,moveCount:0});
+ state.crawfordActive=options.target>1&&!state.crawfordUsed&&state.score.some(sc=>sc===options.target-1);
+ if(state.crawfordActive){state.crawfordUsed=true;log('Crawford-Partie: Der Verdopplungswürfel ist gesperrt.');}
+ log(`Partie ${state.gameNumber} beginnt.`);hideModal();render();
+}
+function log(msg){if(!state)return;state.log.unshift(msg);if(state.log.length>35)state.log.length=35;}
+function playerTurnText(p){return p===0?'Elfenbein':isAI(p)?'Computer':'Rubin';}
+function canDouble(){return state&&(state.phase==='preroll')&&options.target>1&&!state.crawfordActive&&state.cube<64&&(state.cubeOwner===null||state.cubeOwner===state.turn);}
+function allowHumanInput(){return state&&state.turn!==null&&!isAI(state.turn);}
+function onMainAction(){if(!state){showStart();return;}
+ if(state.phase==='opening'){openingRoll();return;}
+ if(!allowHumanInput())return;
+ if(state.phase==='preroll'){rollTurn();return;}
+ if(state.phase==='moving'&&nextMoves(state,state.turn,state.dice).length===0)finishTurn();
+}
+async function openingRoll(){
+ if(!state||state.phase!=='opening')return;
+ const ticket=epoch;state.phase='animating';render();const roll=[randomDie(),randomDie()];
+ await animateDice(roll,[false,true]);if(ticket!==epoch)return;
+ if(roll[0]===roll[1]){log(`Eröffnung ${roll[0]} : ${roll[1]} – Gleichstand, erneut würfeln.`);state.phase='opening';render();
+  if(options.mode==='ai')setTimeoutTracked(()=>{if(ticket===epoch&&state.phase==='opening')openingRoll();},680);return;}
+ const p=roll[0]>roll[1]?0:1;
+ state.turn=p;state.roll=roll;state.dice=roll.slice();state.phase='moving';state.history=[];showDice(roll,[p===1,p===1]);
+ log(`Eröffnung ${roll[0]} : ${roll[1]}. ${playerTurnText(p)} beginnt.`);
+ render();if(isAI(p))scheduleAI();
+}
+async function rollTurn(){
+ if(!state||state.phase!=='preroll')return;
+ const ticket=epoch,p=state.turn;state.phase='animating';render();
+ const vals=[randomDie(),randomDie()];await animateDice(vals,[p===1,p===1]);if(ticket!==epoch)return;
+ state.roll=vals.slice();state.dice=vals[0]===vals[1]?Array(4).fill(vals[0]):vals.slice();state.phase='moving';state.history=[];
+ log(`${playerTurnText(p)} würfelt ${vals[0]} + ${vals[1]}${vals[0]===vals[1]?' (Pasch!)':''}.`);render();
+ if(isAI(p))scheduleAI();
+}
+function legalMoveNow(){return state&&state.phase==='moving'?nextMoves(state,state.turn,state.dice):[];}
+function getSources(){return new Set(legalMoveNow().map(m=>String(m.from)));}
+function tryMove(from,to){
+ if(!state||state.phase!=='moving'||!allowHumanInput())return false;
+ const candidates=legalMoveNow().filter(m=>String(m.from)===String(from)&&String(m.to)===String(to));
+ if(!candidates.length)return false;
+ const m=candidates.find(m=>m.die===Math.abs(Number(m.from)-Number(m.to)))||candidates.slice().sort((a,b)=>a.die-b.die)[0];
+ commitMove(m);return true;
+}
+function commitMove(m){
+ if(!state||state.phase!=='moving')return;
+ const p=state.turn,hit=m.to!=='off'&&opponentCount(state,p,m.to)===1;
+ state.history.push({board:cloneBoard(state),dice:state.dice.slice(),lastMove:state.lastMove});
+ const next=doBoardMove(state,p,m);Object.assign(state,next);
+ const idx=state.dice.indexOf(m.die);if(idx<0)throw new Error('Würfel verbraucht');state.dice.splice(idx,1);
+ state.selected=null;state.lastMove={from:m.from,to:m.to,p};state.moveCount++;
+ const fromLabel=m.from==='bar'?'Bar':String(m.from),toLabel=m.to==='off'?'Aus':String(m.to);
+ log(`${playerTurnText(p)}: ${fromLabel} → ${toLabel} (${m.die})${hit?' · geschlagen!':''}`);
+ moveSound(hit,m.to==='off');
+ if(state.off[p]===15){finishGame(p);return;}
+ render();
+}
+function undo(){if(!state||state.phase!=='moving'||!allowHumanInput()||!state.history.length)return;
+ const old=state.history.pop();Object.assign(state,old.board);state.dice=old.dice;state.lastMove=old.lastMove;state.selected=null;log('Zug zurückgenommen.');uiSound();render();
+}
+function finishTurn(){if(!state||state.phase!=='moving')return;
+ if(legalMoveNow().length)return;
+ const prev=state.turn;
+ if(state.dice.length)log(`${playerTurnText(prev)} kann die übrigen Würfel nicht spielen.`);
+ state.dice=[];state.history=[];state.selected=null;state.lastMove=null;
+ state.turn=1-prev;state.phase='preroll';state.roll=[];render();
+ if(isAI(state.turn))scheduleAI();
+}
+function finishGame(p,refused=false){
+ const loser=1-p;
+ let multiplier=1;
+ if(!refused&&state.off[loser]===0){
+  multiplier=2;
+  if(state.bar[loser]>0){multiplier=3;}
+  else for(let pt=1;pt<=24;pt++)if(home(p,pt)&&ownCount(state,loser,pt)>0){multiplier=3;break;}
+ }
+ const pts=(refused?state.cube:state.cube*multiplier);
+ state.score[p]+=pts;state.phase='gameover';state.dice=[];state.selected=null;state.history=[];
+ const winType=refused?'Aufgabe nach Verdopplung':multiplier===3?'Backgammon':multiplier===2?'Gammon':'einfacher Sieg';
+ log(`${playerTurnText(p)} gewinnt: ${winType}, ${pts} ${pts===1?'Punkt':'Punkte'}.`);
+ render();const matchOver=state.score[p]>=options.target;
+ showResult(p,winType,pts,matchOver);
+}
+function showResult(p,winType,pts,matchOver){
+ const name=playerTurnText(p);const word=matchOver?'MATCH GEWONNEN':'PARTIE BEENDET';
+ const action=matchOver?'Neues Match starten':'Nächste Partie';
+ showModal(`<div class="result-badge">${word}</div><h2>${name} gewinnt!</h2><p>${winType} · <strong style="color:var(--gold)">${pts} ${pts===1?'Punkt':'Punkte'}</strong></p><div class="result-score">${state.score[0]} <span style="color:#719184;font-size:25px">:</span> ${state.score[1]}</div><p>${matchOver?'Das Match ist entschieden.':'Das Match läuft weiter. Die Steine werden für die nächste Partie neu aufgestellt.'}</p><button class="btn-primary" id="resultContinue">${action} →</button>`);
+ $('resultContinue').onclick=matchOver?()=>showStart():nextGame;
+}
+function respondDouble(accept){
+ if(!state||state.phase!=='awaitDouble')return;
+ const asker=state.awaitDouble,receiver=1-asker;
+ state.awaitDouble=null;
+ if(!accept){log(`${playerTurnText(receiver)} lehnt die Verdopplung ab.`);hideModal();finishGame(asker,true);return;}
+ state.cube*=2;state.cubeOwner=receiver;state.phase='preroll';
+ log(`${playerTurnText(receiver)} nimmt die Verdopplung an (Wert ${state.cube}).`);
+ hideModal();uiSound();render();if(isAI(asker))setTimeoutTracked(()=>rollTurn(),750);
+}
+function offerDouble(){if(!canDouble()||!allowHumanInput())return;
+ const asker=state.turn,receiver=1-asker;state.phase='awaitDouble';state.awaitDouble=asker;uiSound();log(`${playerTurnText(asker)} bietet ${state.cube*2} an.`);render();
+ if(isAI(receiver)){setTimeoutTracked(()=>{
+  if(!state||state.phase!=='awaitDouble')return;
+  const advantage=evaluateBoard(state,receiver);const accept=advantage>-(state.cube<=2?105:77)+Math.random()*18;
+  respondDouble(accept);
+ },900);}else showDoubleDecision(asker);
+}
+function showDoubleDecision(asker){
+ const receiver=1-asker;
+ showModal(`<div class="eyebrow">VERDOPPLUNG ANGEBOTEN</div><h2>${playerTurnText(asker)} verdoppelt!</h2><p>${playerTurnText(receiver)}, nimmst du den neuen Spielwert von <strong style="color:var(--gold)">${state.cube*2}</strong> an? Wenn du ablehnst, gewinnt die Gegenseite <strong>${state.cube}</strong> ${state.cube===1?'Punkt':'Punkte'}.</p><div class="decision-buttons"><button class="small-btn" id="rejectDouble" style="font-size:14px">Aufgeben</button><button class="btn-primary" id="acceptDouble">Annehmen</button></div>`);
+ $('rejectDouble').onclick=()=>respondDouble(false);$('acceptDouble').onclick=()=>respondDouble(true);
+}
+function maybeAIDouble(){
+ if(!canDouble()||state.turn!==1||!isAI(1)||state.moveCount<3)return false;
+ const estimate=evaluateBoard(state,1);
+ if(estimate < (state.cube===1?44:54)||estimate>180&&state.cube===1||Math.random()>.48)return false;
+ state.phase='awaitDouble';state.awaitDouble=1;
+ log(`Computer bietet Verdopplung auf ${state.cube*2} an.`);render();
+ showDoubleDecision(1);return true;
+}
+function scheduleAI(){
+ if(!state||!isAI(state.turn))return;
+ const ticket=epoch;
+ setTimeoutTracked(()=>{
+  if(ticket!==epoch||!state||state.turn!==1)return;
+  if(!OVERLAY.classList.contains('hidden')){scheduleAI();return;}
+  if(state.phase==='preroll'){
+   if(maybeAIDouble())return;
+   rollTurn();
+  }else if(state.phase==='moving'){
+   const m=chooseAIMove();
+   if(!m){setTimeoutTracked(()=>{if(ticket===epoch&&state.phase==='moving')finishTurn();},650);return;}
+   commitMove(m);
+   if(state.phase==='moving')scheduleAI();
+  }
+ },state.phase==='moving'?400:750);
+}
+// ---------- SVG board: vectors scale cleanly from mobile to large screens ----------
+const ptX=p=>{if(p>=13&&p<=18)return 68+(p-13)*73+36.5;
+ if(p>=19&&p<=24)return 590+(p-19)*73+36.5;
+ if(p>=7&&p<=12)return 68+(12-p)*73+36.5;
+ return 590+(6-p)*73+36.5;};
+const isTop=p=>p>=13;
+function svgDefs(){return `<defs>
+ <linearGradient id="timber" x2=".9" y2="1"><stop offset="0" stop-color="#c38a50"/><stop offset=".17" stop-color="#6f492d"/><stop offset=".5" stop-color="#503423"/><stop offset=".82" stop-color="#795136"/><stop offset="1" stop-color="#b58353"/></linearGradient>
+ <linearGradient id="feltG" x2="1" y2="1"><stop offset="0" stop-color="#16453d"/><stop offset=".55" stop-color="#1c584b"/><stop offset="1" stop-color="#0e3833"/></linearGradient>
+ <linearGradient id="barG" x2="1" y2="0"><stop offset="0" stop-color="#3c291c"/><stop offset=".45" stop-color="#ad7644"/><stop offset="1" stop-color="#39271e"/></linearGradient>
+ <linearGradient id="lightStone" x1=".1" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#fffdf1"/><stop offset=".38" stop-color="#f0dfbf"/><stop offset=".9" stop-color="#c9ad81"/><stop offset="1" stop-color="#b99a69"/></linearGradient>
+ <linearGradient id="darkStone" x1=".1" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#d18373"/><stop offset=".43" stop-color="#a45548"/><stop offset=".9" stop-color="#682a26"/><stop offset="1" stop-color="#501e1e"/></linearGradient>
+ <linearGradient id="pointRed" x2="0" y2="1"><stop offset="0" stop-color="#ad6952"/><stop offset="1" stop-color="#8d3a32"/></linearGradient>
+ <linearGradient id="pointTan" x2="0" y2="1"><stop offset="0" stop-color="#d2b07d"/><stop offset="1" stop-color="#a5804d"/></linearGradient>
+ <filter id="stoneShadow" x="-50%" y="-50%" width="200%" height="220%"><feDropShadow dx="1.6" dy="3.2" stdDeviation="2.4" flood-color="#001d14" flood-opacity=".7"/></filter>
+ <filter id="targetGlow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="5" result="glow"/><feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <pattern id="feltTexture" patternUnits="userSpaceOnUse" width="17" height="17"><circle cx="3" cy="5" r=".55" fill="#b7d6a8" opacity=".06"/><circle cx="13" cy="11" r=".7" fill="#001d18" opacity=".17"/></pattern>
+ <pattern id="woodgrain" patternUnits="userSpaceOnUse" width="110" height="23"><path d="M0 4Q35 -2 73 7T110 2M0 14Q38 20 80 13T110 16" stroke="#2e1a0f" stroke-width=".6" fill="none" opacity=".24"/></pattern>
+ </defs>`;}
+function checker(cx,cy,p,small=false){
+ const r=small?16:22,fg=p===0?'#715638':'#edd8b7',stroke=p===0?'#b9a079':'#652c29',gradient=p===0?'lightStone':'darkStone';
+ return `<g filter="url(#stoneShadow)" pointer-events="none"><circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#${gradient})" stroke="${stroke}" stroke-width="2"/>
+ <circle cx="${cx}" cy="${cy}" r="${r-4.7}" fill="none" stroke="${fg}" stroke-width="1.7" opacity=".7"/>
+ <circle cx="${cx}" cy="${cy}" r="${r-8}" fill="none" stroke="${fg}" stroke-width=".55" opacity=".38"/>
+ <path d="M ${cx-r*.54} ${cy-r*.48} Q ${cx} ${cy-r*.91} ${cx+r*.42} ${cy-r*.51}" stroke="#fff" stroke-opacity=".35" stroke-width="2" fill="none"/></g>`;
+}
+function pointMarkup(p,s,sources,targets,selected){
+ const x=ptX(p),top=isTop(p),col=(p>=19? p-19:p>=13?p-13:p>=7?12-p:6-p),isRed=(col+(p>=19||p<=6?0:0))%2===0;
+ const yBase=top?99:601,ytip=top?338:362;
+ const selectedHere=selected!==null&&String(selected)===String(p),destHere=targets.has(String(p)),sourceHere=sources.has(String(p));
+ const fill=isRed?'url(#pointRed)':'url(#pointTan)';
+ let str=`<g data-target="${p}" aria-label="Feld ${p}" role="button"><rect x="${x-36.5}" y="${top?95:362}" width="73" height="${top?243:243}" fill="transparent" class="point-hover" opacity="0"/>
+ <polygon points="${x-34},${yBase} ${x+34},${yBase} ${x},${ytip}" fill="${fill}" stroke="#112b24" stroke-width="1.7" opacity=".93"/>
+ <polygon points="${x-28},${yBase+ (top?4:-4)} ${x+28},${yBase+(top?4:-4)} ${x},${top?315:385}" fill="none" stroke="#ffe6b5" stroke-opacity=".16" stroke-width="1"/>
+ ${sourceHere?`<ellipse cx="${x}" cy="${top?109:591}" rx="25" ry="9" fill="#e2c080" opacity=".62"/>`:''}
+ ${selectedHere?`<polygon points="${x-34},${yBase} ${x+34},${yBase} ${x},${ytip}" fill="#f9d48a" fill-opacity=".17" stroke="#f4d187" stroke-width="4" filter="url(#targetGlow)"/>`:''}
+ ${destHere?`<polygon points="${x-31},${yBase} ${x+31},${yBase} ${x},${ytip}" fill="#72e2ac" fill-opacity=".28" stroke="#9cf7bd" stroke-width="3" filter="url(#targetGlow)"/><circle cx="${x}" cy="${top?254:445}" r="12" fill="#8aefbb" opacity=".8"/><circle cx="${x}" cy="${top?254:445}" r="5" fill="#1a4a39"/>`:''}
+ <text x="${x}" y="${top?85:625}" text-anchor="middle" font-size="17" fill="${sourceHere?'#f3d08f':'#c6d4b4'}" opacity="${sourceHere?1:.72}" font-weight="${sourceHere?'bold':'normal'}" pointer-events="none">${p}</text>`;
+ const val=s.points[p],who=ownerOf(val),total=Math.abs(val);
+ if(total&&who!==null){
+  const shown=Math.min(6,total);
+  for(let j=0;j<shown;j++)str+=checker(x,top?125+j*41:574-j*41,who);
+  if(total>6){const cy=top?125+5*41:574-5*41;
+   str+=`<circle cx="${x}" cy="${cy}" r="14" fill="#203e32" stroke="#f2cf89" stroke-width="2" pointer-events="none"/><text x="${x}" y="${cy+5}" font-size="15" fill="#ffedc9" text-anchor="middle" font-weight="900" pointer-events="none">${total}</text>`;}
+ }
+ str+='</g>';return str;
+}
+function barMarkup(s,sources,targets,selected){
+ const isSource=sources.has('bar'),isSelected=selected==='bar';
+ let str=`<g data-target="bar" role="button" aria-label="Bar"><rect x="518" y="101" width="60" height="497" rx="7" fill="transparent"/>
+ ${(isSource||isSelected)?`<rect x="518" y="101" width="60" height="497" rx="7" fill="#f7d38c" opacity="${isSelected?.27:.11}" stroke="#ffe1a0" stroke-width="3"/>`:''}`;
+ for(const p of [1,0]){const count=s.bar[p],shown=Math.min(count,5);
+  for(let j=0;j<shown;j++)str+=checker(548,p===1?147+j*42:551-j*42,p);
+  if(count>5){const yy=p===1?147+4*42:551-4*42;str+=`<circle cx="548" cy="${yy}" r="13" fill="#132b25" stroke="#eed19e" stroke-width="2"/><text x="548" y="${yy+5}" font-size="15" fill="#f3e0b7" text-anchor="middle" font-weight="bold">${count}</text>`;}
+ }
+ return str+'</g>';
+}
+function trayMarkup(s,targets){
+ const chosen=targets.has('off');let str=`<g data-target="off" role="button" aria-label="Stein ausspielen"><rect x="1040" y="100" width="75" height="499" rx="8" fill="#281c15" stroke="#a77846" stroke-width="3"/><path d="M1046 350H1109" stroke="#b38350" stroke-width="4"/>
+ ${chosen?'<rect x="1040" y="356" width="75" height="239" rx="7" fill="#62d49d" opacity=".24" stroke="#9ef3b9" stroke-width="3"/>':''}
+ <text x="1077" y="132" text-anchor="middle" font-size="12" letter-spacing="1.5" fill="#d1a777">RUBIN</text><text x="1077" y="574" text-anchor="middle" font-size="12" letter-spacing="1.5" fill="#d1a777">ELFENBEIN</text>`;
+ for(let p=0;p<2;p++){
+  const count=s.off[p],cy=p===1?258:439;
+  if(count){const rows=Math.min(5,count);for(let j=0;j<rows;j++){
+   const y=p===1?320-j*25:369+j*25;
+   str+=`<rect x="1051" y="${y}" width="53" height="14" rx="7" fill="${p===0?'url(#lightStone)':'url(#darkStone)'}" stroke="${p===0?'#fbe8c5':'#c38470'}" stroke-width="1.5"/>`;
+  }}
+  str+=`<circle cx="1077" cy="${cy}" r="24" fill="#173a31" stroke="#987747" stroke-width="2"/><text x="1077" y="${cy+7}" text-anchor="middle" font-family="Georgia,serif" font-size="24" fill="#f5dfb6">${count}</text>`;
+ }
+ str+='</g>';return str;
+}
+function renderBoard(){
+ const s=state||startBoard(),human=state&&state.phase==='moving'&&!isAI(state.turn),legal=human?legalMoveNow():[],selected=state?state.selected:null;
+ const sources=human?new Set(legal.map(m=>String(m.from))):new Set(),targets=new Set();
+ if(selected!==null)for(const m of legal)if(String(m.from)===String(selected))targets.add(String(m.to));
+ let out=svgDefs();
+ out+=`<rect x="18" y="16" width="1144" height="667" rx="26" fill="#100e09"/><rect x="25" y="22" width="1130" height="650" rx="24" fill="url(#timber)" stroke="#dfb47d" stroke-width="3"/><rect x="25" y="22" width="1130" height="650" rx="24" fill="url(#woodgrain)"/>
+ <rect x="45" y="43" width="1090" height="610" rx="14" fill="#2b2016" stroke="#d09b63" stroke-width="2"/><rect x="56" y="54" width="1070" height="590" rx="8" fill="url(#feltG)" stroke="#142c25" stroke-width="4"/><rect x="56" y="54" width="1070" height="590" rx="8" fill="url(#feltTexture)"/>
+ <rect x="514" y="54" width="68" height="590" fill="url(#barG)" stroke="#3d2b20" stroke-width="3"/><rect x="523" y="56" width="50" height="587" fill="#bd8a58" opacity=".12"/>
+ <path d="M67 349H511M585 349H1028" stroke="#d7b078" stroke-opacity=".44" stroke-width="2"/><rect x="1033" y="54" width="90" height="590" fill="url(#barG)" stroke="#2b1e17" stroke-width="3"/>
+ <path d="M 63 60L 62 635M1120 61L1120 638" stroke="#f5c48a" opacity=".23" stroke-width="3"/>`;
+ for(let p=1;p<=24;p++)out+=pointMarkup(p,s,sources,targets,selected);
+ out+=barMarkup(s,sources,targets,selected);out+=trayMarkup(s,targets);
+ out+=`<circle cx="547" cy="348" r="17" fill="#553a24" stroke="#dbb076" stroke-width="2"/><text x="547" y="354" font-family="Georgia,serif" font-size="19" fill="#eec692" text-anchor="middle">✦</text>
+ <path d="M 36 36H1144M36 661H1144" stroke="#f3d29a" stroke-opacity=".16" stroke-width="1.2"/>`;
+ BOARD.innerHTML=out;
+}
+function render(){
+ const s=state,playing=!!s,phase=s?.phase||'init',turn=s?.turn;
+ $('whiteName').textContent=options.mode==='ai'?'Du · Elfenbein':'Person 1 · Elfenbein';
+ $('blackName').textContent=options.mode==='ai'?'Computer · Rubin':'Person 2 · Rubin';
+ $('whiteScore').classList.toggle('active',playing&&turn===0&&phase!=='gameover');
+ $('blackScore').classList.toggle('active',playing&&turn===1&&phase!=='gameover');
+ $('whitePoints').textContent=s?.score[0]??0;$('blackPoints').textContent=s?.score[1]??0;
+ $('whiteOff').textContent=s?.off[0]??0;$('blackOff').textContent=s?.off[1]??0;
+ $('matchLength').textContent=`${options.target} ${options.target===1?'Punkt':'Punkte'}`;
+ $('gameNumber').textContent=`Partie ${s?.gameNumber||1}`;
+ $('crawfordBadge').classList.toggle('show',!!s?.crawfordActive);
+ $('cube').textContent=s?.cube??1;
+ $('cubeOwner').textContent=!s||s.cubeOwner===null?'Beide':sideName(s.cubeOwner);
+ $('barInfo').textContent=`Elfenbein ${s?.bar[0]||0} · Rubin ${s?.bar[1]||0}`;
+ $('modeInfo').textContent=options.mode==='ai'?'Gegen Computer':'Zwei Personen';
+ $('soundBtn').textContent=muted?'♩̸':'♫';$('soundBtn').title=muted?'Ton einschalten':'Ton ausschalten';
+ $('undoBtn').disabled=!playing||phase!=='moving'||!allowHumanInput()||s.history.length===0;
+ $('doubleBtn').disabled=!canDouble()||!allowHumanInput();
+ const btn=$('mainAction');let btnText='Match starten',disabled=false,title='Bereit zum Spielen',eyebrow='BACKGAMMON',message=openingText;
+ if(!playing){disabled=true;btnText='Match starten';}
+ else if(phase==='opening'){btnText='Eröffnung würfeln';title='Eröffnungswurf';eyebrow='SPIELBEGINN';message=openingText;}
+ else if(phase==='animating'){btnText='Würfel rollen …';title='Es wird gewürfelt';eyebrow='WÜRFEL';message='Die Würfel fallen …';disabled=true;}
+ else if(phase==='preroll'){
+  title=isAI(turn)?'Computer ist am Zug':`${playerTurnText(turn)} ist am Zug`;
+  eyebrow='NÄCHSTER ZUG';message=isAI(turn)?'Computer überlegt …':'Würfle, um deinen Zug zu beginnen. Vor dem Wurf kannst du verdoppeln.';
+  btnText=isAI(turn)?'Computer würfelt …':'Würfeln';disabled=isAI(turn);
+ }
+ else if(phase==='moving'){
+  const moves=legalMoveNow(),mustBar=s.bar[turn]>0;
+  title=isAI(turn)?'Computer zieht':`${playerTurnText(turn)} zieht`;
+  eyebrow='STEINE BEWEGEN';
+  if(isAI(turn)){message='Computer wählt seinen nächsten Zug …';btnText='Computer zieht …';disabled=true;}
+  else if(!moves.length){message=s.dice.length?'Keine gültigen Züge mehr. Beende deinen Zug.':'Alle Würfel gespielt. Beende deinen Zug.';btnText='Zug beenden';}
+  else{message=mustBar?'<strong>Stein auf der Bar:</strong> Du musst ihn zuerst wieder ins Spiel bringen.':'Wähle einen markierten Stein und anschliessend das Zielfeld.';btnText='Steine setzen';disabled=true;}
+ }
+ else if(phase==='awaitDouble'){eyebrow='VERDOPPLUNG';title='Verdopplung angeboten';message='Der Verdopplungswürfel wartet auf eine Entscheidung.';btnText='Entscheidung ausstehend';disabled=true;}
+ else if(phase==='gameover'){eyebrow='PARTIE BEENDET';title='Partie entschieden';message='Die Partie ist beendet.';btnText='Partie beendet';disabled=true;}
+ $('turnEyebrow').textContent=eyebrow;$('turnTitle').textContent=title;$('turnMessage').innerHTML=message;btn.textContent=btnText;btn.disabled=disabled;
+ $('diceCaption').textContent=phase==='opening'||!playing?'ERÖFFNUNGSWÜRFEL':`WÜRFEL · ${turn===1?'RUBIN':'ELFENBEIN'}`;
+ $('diceState').textContent=phase==='moving'?`Wurf: ${s.roll.join(' + ')}`:phase==='animating'?'ROLLEN …':phase==='opening'?'JE EIN WÜRFEL':'—';
+ const remaining=$('remainingDice');remaining.innerHTML=phase==='moving'?(s.dice.length?s.dice.map(d=>`<span class="die-chip" title="Noch verfügbar: ${d}">${d}</span>`).join(''):'<span class="empty-dice">Alle Würfel verbraucht</span>'):'<span class="empty-dice">'+(phase==='opening'?'Höhere Zahl beginnt':'Bereit für den nächsten Wurf')+'</span>';
+ $('logList').innerHTML=s?.log.length?s.log.slice(0,12).map((entry,i)=>`<li><span class="clock">${i===0?'◆':'·'}</span>${escapeHTML(entry)}</li>`).join(''):'<li>Bereit für eine neue Partie.</li>';
+ $('boardHelp').textContent=phase==='moving'&&!isAI(turn)?s.selected!==null?'Grüne Felder sind gültige Ziele. Klicke auf eines davon.':'Wähle einen deiner Steine und anschliessend ein markiertes Zielfeld.':'Klicke einen Stein an oder ziehe ihn mit der Maus auf ein Zielfeld.';
+ renderBoard();
+}
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function targetFrom(el){const group=el?.closest?.('[data-target]');if(!group||!BOARD.contains(group))return null;const val=group.dataset.target;return val==='bar'||val==='off'?val:Number(val);}
+function handleBoardClick(to){
+ if(to===null||!state||state.phase!=='moving'||!allowHumanInput()||!OVERLAY.classList.contains('hidden'))return;
+ const legal=legalMoveNow(),sources=new Set(legal.map(m=>String(m.from)));
+ if(state.selected!==null){
+  if(tryMove(state.selected,to))return;
+  if(String(state.selected)===String(to)){state.selected=null;uiSound();render();return;}
+ }
+ if(sources.has(String(to))){state.selected=to;uiSound();render();return;}
+ state.selected=null;render();
+}
+BOARD.addEventListener('click',e=>{if(suppressClick){suppressClick=false;return;}handleBoardClick(targetFrom(e.target));});
+BOARD.addEventListener('pointerdown',e=>{if(e.button!==0&&e.pointerType==='mouse')return;if(!state||state.phase!=='moving'||!allowHumanInput())return;
+ const from=targetFrom(e.target);if(from===null)return;
+ if(new Set(legalMoveNow().map(m=>String(m.from))).has(String(from)))dragStart={from,x:e.clientX,y:e.clientY,pointerId:e.pointerId};
+});
+window.addEventListener('pointerup',e=>{if(!dragStart||dragStart.pointerId!==e.pointerId)return;
+ const original=dragStart;dragStart=null;
+ if(Math.hypot(e.clientX-original.x,e.clientY-original.y)<14)return;
+ const target=targetFrom(document.elementFromPoint(e.clientX,e.clientY));
+ if(target!==null&&tryMove(original.from,target)){suppressClick=true;setTimeoutTracked(()=>{suppressClick=false;},75);}
+});
+window.addEventListener('pointercancel',()=>{dragStart=null;});
+// ---------- Dialogs and controls ----------
+function showModal(html){MODAL.innerHTML=html;OVERLAY.classList.remove('hidden');}
+function hideModal(){OVERLAY.classList.add('hidden');MODAL.innerHTML='';}
+function showStart(){
+ if(!stagedOptions)stagedOptions={...options};
+ const o=stagedOptions;
+ const current=!!state&&state.phase!=='gameover';
+ showModal(`<div class="modal-mark">♟</div><h2>Backgammon</h2><p>Klassisches Backgammon auf grünem Filz. Mit animierten 3D-Würfeln, echtem Würfelklackern und den regulären Zugregeln.</p>
+ <span class="form-label">Gegner</span><div class="choice-row"><button class="choice ${o.mode==='ai'?'active':''}" data-mode="ai">♜ Gegen Computer</button><button class="choice ${o.mode==='local'?'active':''}" data-mode="local">♟ Zu zweit am Gerät</button></div>
+ <span class="form-label">Matchlänge</span><div class="choice-row triple"><button class="choice ${o.target===1?'active':''}" data-target="1">1 Punkt</button><button class="choice ${o.target===3?'active':''}" data-target="3">3 Punkte</button><button class="choice ${o.target===5?'active':''}" data-target="5">5 Punkte</button></div>
+ <span class="form-label">Schwierigkeit (Computer)</span><select class="select" id="difficultySelect" ${o.mode==='local'?'disabled':''}><option value="easy" ${o.difficulty==='easy'?'selected':''}>Einfach</option><option value="normal" ${o.difficulty==='normal'?'selected':''}>Normal</option><option value="hard" ${o.difficulty==='hard'?'selected':''}>Anspruchsvoll</option></select>
+ <div class="modal-callout">Die hellen Steine ziehen von Feld 24 nach 1, die roten von 1 nach 24. Ein Stein auf der Bar muss zuerst zurück ins Spiel. Ein Pasch wird viermal gespielt.</div>
+ <button class="btn-primary" id="startGameBtn">${current?'Neues Match beginnen':'Match beginnen'} →</button>${current?'<button class="modal-close" style="float:none;width:100%;margin-top:12px" id="cancelStart">Abbrechen</button>':''}`);
+ MODAL.querySelectorAll('[data-mode]').forEach(btn=>btn.onclick=()=>{stagedOptions.mode=btn.dataset.mode;showStart();});
+ MODAL.querySelectorAll('[data-target]').forEach(btn=>btn.onclick=()=>{stagedOptions.target=Number(btn.dataset.target);showStart();});
+ $('difficultySelect').onchange=e=>{stagedOptions.difficulty=e.target.value;};
+ $('startGameBtn').onclick=newMatch;
+ if(current)$('cancelStart').onclick=()=>{stagedOptions=null;hideModal();render();};
+}
+function showRules(){
+ showModal(`<button class="modal-close" id="closeRules">✕ Schliessen</button><div class="eyebrow">KURZANLEITUNG</div><h2>So spielst du</h2>
+ <div class="rule-section"><h3>Das Ziel</h3><p>Bewege alle 15 eigenen Steine ins Heimatfeld und spiele sie dann heraus. Wer zuerst alle 15 Steine draussen hat, gewinnt.</p></div>
+ <div class="rule-section"><h3>Ziehen</h3><p>Elfenbein bewegt sich von 24 nach 1, Rubin von 1 nach 24. Jede Würfelzahl ist ein eigener Zug. Du darfst sie auf einen oder auf zwei Steine verteilen. Bei einem Pasch gelten vier gleiche Züge.</p></div>
+ <div class="rule-section"><h3>Pflichtzüge</h3><p>Spiele möglichst beide Würfel beziehungsweise bei einem Pasch möglichst viele der vier Züge. Wenn nur eine von zwei verschiedenen Zahlen gespielt werden kann, musst du die höhere verwenden.</p></div>
+ <div class="rule-section"><h3>Schlagen und Bar</h3><p>Du darfst ein leeres Feld oder ein Feld mit eigenen Steinen betreten. Ein einzelner gegnerischer Stein wird geschlagen und auf die Bar gesetzt. Felder mit zwei oder mehr gegnerischen Steinen sind gesperrt. Steine auf der Bar müssen vor allen anderen Zügen wieder eingesetzt werden.</p></div>
+ <div class="rule-section"><h3>Ausspielen</h3><p>Wenn alle eigenen Steine im letzten Viertel des Bretts stehen, darfst du sie ausspielen. Ein zu hoher Würfel darf nur verwendet werden, wenn kein eigener Stein weiter vom Ziel entfernt steht.</p></div>
+ <div class="rule-section"><h3>Verdoppeln und Wertung</h3><p>Vor dem eigenen Wurf darf der Spielwert verdoppelt werden. Wer annimmt, erhält als Nächstes das Verdopplungsrecht; wer ablehnt, verliert den bisherigen Spielwert. Ein normaler Sieg zählt den einfachen Würfelwert; Gammon (Gegner hat nichts ausgespielt) doppelt; Backgammon (zusätzlich Gegnerstein auf der Bar oder in deinem Heimatfeld) dreifach. Bei Matches gilt die Crawford-Regel: die erste Partie, in der jemand einen Punkt vor dem Matchsieg steht, wird ohne Verdoppeln gespielt.</p></div>
+ <div class="rule-section"><h3>Bedienung</h3><p>Klicke einen Stein und dann ein grün markiertes Zielfeld an. Alternativ kannst du Steine ziehen. Mit „Rückgängig“ nimmst du Züge bis zum Ende des laufenden Wurfes zurück.</p></div>
+ <button class="btn-primary" id="closeRulesBottom">Verstanden</button>`);
+ $('closeRules').onclick=hideModal;$('closeRulesBottom').onclick=hideModal;
+}
+$('rulesBtn').onclick=showRules;
+$('newBtn').onclick=showStart;
+$('soundBtn').onclick=()=>{muted=!muted;if(!muted)uiSound();render();};
+$('mainAction').onclick=onMainAction;
+$('undoBtn').onclick=undo;
+$('doubleBtn').onclick=offerDouble;
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape'&&!OVERLAY.classList.contains('hidden')&&state?.phase!=='awaitDouble'&&state?.phase!=='gameover'&&state){stagedOptions=null;hideModal();render();return;}
+ if((e.key==='z'||e.key==='Z')&&e.ctrlKey){e.preventDefault();undo();}
+});
+showDice([1,1],[false,true]);render();showStart();
+// Expose pure rules for built-in regression tests and future local debugging.
+window.__BACKGAMMON_RULES__={legalForDie,doBoardMove,maxPlayable,nextMoves,allHome,pipCount,startBoard};
+})();
+</script>
+</body>
+</html>
