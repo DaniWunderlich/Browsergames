@@ -207,10 +207,15 @@ function buildDie(el){
  el.innerHTML=[1,6,3,4,2,5].map(n=>`<div class="die-face ${FACE_CLASSES[n]}">${Array.from({length:9},(_,i)=>PIP_LAYOUT[n].includes(i)?'<span class="pip"></span>':'<span></span>').join('')}</div>`).join('');
 }
 buildDie($('die1'));buildDie($('die2'));
-function showDice(values,dark=[false,false]){
+function showDice(values,dark=[false,false],frontal=false){
  for(let i=0;i<2;i++){
   const el=$('die'+(i+1));el.classList.toggle('die-dark',dark[i]);
-  const [x,y]=FACE_ANGLES[values[i]];el.style.transform=`rotateX(${x-23}deg) rotateY(${y-28}deg)`;
+  const [x,y]=FACE_ANGLES[values[i]];
+  if(frontal){
+   el.style.transform=`rotateX(${x}deg) rotateY(${y}deg)`;
+  }else{
+   el.style.transform=`rotateX(${x-23}deg) rotateY(${y-28}deg)`;
+  }
  }
  dieValues=values.slice();lastDiceDark=dark.slice();
 }
@@ -237,7 +242,7 @@ async function animateDice(values,dark){
  for(let i=0;i<2;i++){
   const el=$('die'+(i+1));el.getAnimations().forEach(a=>a.cancel());el.classList.remove('rolling');
  }
- showDice(values,dark);
+ showDice(values,dark,true);
 }
 function startBoard(){
  const points=Array(25).fill(0);
