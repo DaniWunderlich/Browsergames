@@ -30,4 +30,4 @@ Metaspiel über Fernsehen. Moderiere eine Sendung, verstricke dich in Kabelsalat
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)

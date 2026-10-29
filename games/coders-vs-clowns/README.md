@@ -30,4 +30,4 @@ Ein chaotisches Duell zwischen den zwei mächtigsten Kräften der Unternehmensku
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)

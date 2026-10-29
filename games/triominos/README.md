@@ -30,4 +30,4 @@ Das verwandte Spiel zu Dominoes, aber mit Dreiecken statt Rechtecken. Lege Stein
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)

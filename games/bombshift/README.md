@@ -30,4 +30,4 @@ Schnelles Action-Arcade-Game. Shiften, ausweichen, Bomben werfen, überleben. Al
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)

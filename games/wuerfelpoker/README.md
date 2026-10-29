@@ -30,4 +30,4 @@ Poker mit Würfeln statt Karten. Würfel werfen, Kombinationen bilden, Bluffing 
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)

@@ -30,4 +30,4 @@ Fahre durch eine endlose Straße, weiche Hindernissen aus, sammle Power-ups, ver
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)

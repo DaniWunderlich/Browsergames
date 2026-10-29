@@ -30,4 +30,4 @@ Product Owner Whack-A-Mole Parodie. Ein PO taucht auf, du schlagst (oder ignorie
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)

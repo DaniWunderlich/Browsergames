@@ -29,4 +29,4 @@ Eine wilde Mischung aus Agile-Methodologie und Arcade-Action. Die Sprints sind k
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)

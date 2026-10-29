@@ -30,4 +30,4 @@ Pool/Billard im Retro-Stil. Nach Feierabend (AFTER HOURS) spielen wir Billard. S
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)

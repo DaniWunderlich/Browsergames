@@ -30,4 +30,4 @@ Deckbuilder-Roguelike. Starte mit wenigen Karten, baue dein Deck auf, kämpfe du
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)

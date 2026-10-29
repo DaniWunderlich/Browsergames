@@ -30,4 +30,4 @@ Das legendäre Tetris in Browser-Form mit Neon-Flair. Stack es, clear es, bis du
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)

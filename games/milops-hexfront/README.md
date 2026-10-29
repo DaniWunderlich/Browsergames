@@ -30,4 +30,4 @@ Strategisches Hexagon-Taktikspiel im "vielleicht-gibt-es-einen-Plot"-Modus. Bewe
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)

@@ -30,4 +30,4 @@ Pixeliges Rettungs-Adventure. Kleine Charaktere müssen Ärger entkommen, durch 
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)

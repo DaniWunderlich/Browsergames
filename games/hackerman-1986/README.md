@@ -30,4 +30,4 @@ Ein Hacker-Simulator aus der Vergangenheit mit Cyberpunk-Vibes. Durch Code-Labyr
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)

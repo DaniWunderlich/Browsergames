@@ -30,4 +30,4 @@ Match-3 Puzzle im Retro-Style. Vertausche Edelsteine, bilde Reihen aus 3+, verdi
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)

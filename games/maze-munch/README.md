@@ -30,4 +30,4 @@ Klassischer Maze-Runner mit Ghosts und Pellets. Retro-Arcade-Feeling trifft Brow
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)

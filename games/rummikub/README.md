@@ -30,4 +30,4 @@ Der Klassiker aus Omas Spielzimmer – jetzt am Browser! Kombiniere Nummern-Sets
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)

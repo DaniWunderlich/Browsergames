@@ -30,4 +30,4 @@ Brick-Breaker mit Neon-Vibes. Zerstöre farbige Steine mit dem Ball, catcher nic
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)

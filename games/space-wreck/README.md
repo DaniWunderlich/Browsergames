@@ -30,4 +30,4 @@ Science-Fiction Taktikspiel im All. Deine Raumschiff-Crews kämpfen gegen die My
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)

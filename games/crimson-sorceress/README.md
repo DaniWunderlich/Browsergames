@@ -30,4 +30,4 @@ Flipper-Spiel mit magischem Fantasy-Setting. Rote Hexe, bunte Ziele, Pinball-Cha
 
 ---
 
-[← Zurück zur Übersicht](../README.md)
+[← Zurück zur Übersicht](../../README.md)
