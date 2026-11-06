@@ -1,6 +1,6 @@
 # 🎮 Browser Games — Prototyp Paradise
 
-Willkommen in einer Sammlung von **26 vollständig funktionierenden (und teilweise funktionierenden) Browser-Spielen**. 
+Willkommen in einer Sammlung von **28 vollständig funktionierenden (und teilweise funktionierenden) Browser-Spielen**. 
 
 > ⚠️ **Wichtiger Disclaimer:** Das hier sind **Prototypen**. **Fun Projects**. Die sollen vor allem eins: Spaß machen. Bugs? Natürlich. Glitches? Garantiert. Crashes bei unerwarteten Eingaben? Sehr wahrscheinlich. Aber genau das macht sie charmant, oder? 🐛✨
 
@@ -10,9 +10,11 @@ Willkommen in einer Sammlung von **26 vollständig funktionierenden (und teilwei
 | Game | Beschreibung | Link |
 |------|-------------|------|
 | **AGILEGEDDON!** | Die Sprint-Safari – Agile meets Arcade | [→ Details](games/agilegeddon/README.md) |
+| **BLUTMOND** | Der letzte Traum – Dark Gothic Taktik-RPG | [→ Details](games/blutmond-der-letzte-traum/README.md) |
 | **CODERS vs. CLOWNS** | Agile Apocalypse – Programmierer vs. Klamauk | [→ Details](games/coders-vs-clowns/README.md) |
 | **MILOPS ECHO FRONT** | Hex Tactics für Strategen | [→ Details](games/milops-hexfront/README.md) |
 | **SPACE WRECK** | Voidbreach Tactics – Science Fiction Schach | [→ Details](games/space-wreck/README.md) |
+| **SPRINT BREACH** | Agile Dystopia – Corporate Survival Taktik | [→ Details](games/sprint-breach/README.md) |
 | **STELLWERK '86** | Train Dispatcher – Railway Chaos | [→ Details](games/train-dispatcher/README.md) |
 
 ### ⚡ Arcade & Action
