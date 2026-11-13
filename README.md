@@ -12,6 +12,7 @@ Willkommen in einer Sammlung von **28 vollständig funktionierenden (und teilwei
 | **AGILEGEDDON!** | Die Sprint-Safari – Agile meets Arcade | [→ Details](games/agilegeddon/README.md) |
 | **BLUTMOND** | Der letzte Traum – Dark Gothic Taktik-RPG | [→ Details](games/blutmond-der-letzte-traum/README.md) |
 | **CODERS vs. CLOWNS** | Agile Apocalypse – Programmierer vs. Klamauk | [→ Details](games/coders-vs-clowns/README.md) |
+| **MERGE CONFLICT** | Devs vs. Buzzwords – Squad Tactical Auto-Battler | [→ Details](games/merge-conflict/README.md) |
 | **MILOPS ECHO FRONT** | Hex Tactics für Strategen | [→ Details](games/milops-hexfront/README.md) |
 | **SPACE WRECK** | Voidbreach Tactics – Science Fiction Schach | [→ Details](games/space-wreck/README.md) |
 | **SPRINT BREACH** | Agile Dystopia – Corporate Survival Taktik | [→ Details](games/sprint-breach/README.md) |
@@ -33,6 +34,7 @@ Willkommen in einer Sammlung von **28 vollständig funktionierenden (und teilwei
 |------|-------------|------|
 | **Backgammon** | The Felt Club – Klassiker mit Verdopplungswürfel & 3D-Würfeln | [→ Details](games/backgammon/README.md) |
 | **DUNSCHTIGS JASS** | Schwizer Charte-Klassiker – Mittwoch im Browser | [→ Details](games/dunschtigs-jass/README.md) |
+| **MALEFIZ** | Offline-Brettspiel V5 – Sperrsteine, Würfeln, Chaos | [→ Details](games/malefiz/README.md) |
 | **Rummikub** | Der Klassiker – Browser Edition | [→ Details](games/rummikub/README.md) |
 | **Triominos** | Domino meets Triangle – Kniffliger als es aussieht | [→ Details](games/triominos/README.md) |
 | **Dice Poker** | Würfelpoker – Retro & Glücksabhängig | [→ Details](games/wuerfelpoker/README.md) |
