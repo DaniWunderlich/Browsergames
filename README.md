@@ -1,12 +1,21 @@
 # 🎮 Browser Games — Prototyp Paradise
 
-Willkommen in einer Sammlung von **28 vollständig funktionierenden (und teilweise funktionierenden) Browser-Spielen**. 
+**Deutsch** | [English (UK)](README.en.md)
+
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
+[![28 Spiele](https://img.shields.io/badge/Games-28-blue)](#-das-spiel-portfolio)
+[![Status: Prototypen](https://img.shields.io/badge/Status-Prototypes-orange)](#-status--disclaimer)
+
+Willkommen in einer Sammlung von **28 vollständig funktionierenden (und teilweise funktionierenden) Browser-Spielen**.
 
 > ⚠️ **Wichtiger Disclaimer:** Das hier sind **Prototypen**. **Fun Projects**. Die sollen vor allem eins: Spaß machen. Bugs? Natürlich. Glitches? Garantiert. Crashes bei unerwarteten Eingaben? Sehr wahrscheinlich. Aber genau das macht sie charmant, oder? 🐛✨
 
 ## 🎯 Das Spiel-Portfolio
 
 ### 🏛️ Taktische Schlachtfelder
+
 | Game | Beschreibung | Link |
 |------|-------------|------|
 | **AGILEGEDDON!** | Die Sprint-Safari – Agile meets Arcade | [→ Details](games/agilegeddon/README.md) |
@@ -19,6 +28,7 @@ Willkommen in einer Sammlung von **28 vollständig funktionierenden (und teilwei
 | **STELLWERK '86** | Train Dispatcher – Railway Chaos | [→ Details](games/train-dispatcher/README.md) |
 
 ### ⚡ Arcade & Action
+
 | Game | Beschreibung | Link |
 |------|-------------|------|
 | **BOMBSHIFT** | Retro Arcade – Bomben shiften, Hirn überlasten | [→ Details](games/bombshift/README.md) |
@@ -30,6 +40,7 @@ Willkommen in einer Sammlung von **28 vollständig funktionierenden (und teilwei
 | **HACKERMAN 1986** | GHOSTLINE – Hacker auf Abwegen | [→ Details](games/hackerman-1986/README.md) |
 
 ### 🃏 Klassische Brettspiele
+
 | Game | Beschreibung | Link |
 |------|-------------|------|
 | **Backgammon** | The Felt Club – Klassiker mit Verdopplungswürfel & 3D-Würfeln | [→ Details](games/backgammon/README.md) |
@@ -41,6 +52,7 @@ Willkommen in einer Sammlung von **28 vollständig funktionierenden (und teilwei
 | **AFTER HOURS** | Retro 8-Ball Billard | [→ Details](games/retro-8ball/README.md) |
 
 ### 🎪 Spezialeffekte & Sonderformate
+
 | Game | Beschreibung | Link |
 |------|-------------|------|
 | **Crimson Sorceress** | Fantasy Pinball 1986 – Flipperspiel-Magie | [→ Details](games/crimson-sorceress/README.md) |
@@ -54,10 +66,16 @@ Willkommen in einer Sammlung von **28 vollständig funktionierenden (und teilwei
 
 ## 🚀 Wie man spielen kann
 
-1. Einfach ein `.html`-File aus diesem Repo herunterladen
-2. Im Browser öffnen
+1. Ein Spiel unter `games/` auswählen und die zugehörige `.html`-Datei herunterladen. Auf GitHub dafür die Datei öffnen und **Download raw file** wählen. Alternativ das gesamte Repository über **Code → Download ZIP** herunterladen und entpacken.
+2. Die heruntergeladene `.html`-Datei im Browser öffnen.
 3. Spielen, crashen, nochmal versuchen
-4. Bei Bugs: Umarmen oder Issue schreiben (beides geht)
+4. Bei Bugs: Umarmen oder ein [Issue schreiben](https://github.com/DaniWunderlich/Browsergames/issues) (beides geht)
+
+## 🛠️ Technik & Tests
+
+Die Spiele bestehen jeweils aus einer eigenständigen **HTML-Datei mit eingebettetem CSS und JavaScript**. Ein Build-Schritt, Paketmanager oder Server ist zum Spielen nicht nötig.
+
+Automatisierte Tests und GitHub-Actions-Workflows sind derzeit nicht eingerichtet. Deshalb gibt es noch keinen Test- oder CI-Status-Badge.
 
 ## 📝 Status & Disclaimer
 
